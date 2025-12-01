@@ -3,6 +3,14 @@
     {
       "name": "page_text_font_size",
       "value": "50fp"
+    },
+    {
+      "name": "page_text_normal_size",
+      "value": "25fp"
+    },
+    {
+      "name": "text_vertical_padding",
+      "value": "5"
     }
   ]
 }

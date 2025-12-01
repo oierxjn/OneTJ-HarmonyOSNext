@@ -10,7 +10,19 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "一统同济"
+    },
+    {
+      "name": "Uni_login",
+      "value": "统一身份认证登录"
+    },
+    {
+      "name": "Join_in_group",
+      "value": "加入讨论群"
+    },
+    {
+      "name": "Permission_Internet_require_reason",
+      "value": "用于验证用户登录，请求云端用户数据"
     }
   ]
 }
