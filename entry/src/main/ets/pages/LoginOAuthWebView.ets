@@ -1,23 +1,44 @@
-@Entry
+import { webview } from "@kit.ArkWeb";
+import { WebUrlConstants } from "../constants/WebUrlConstants";
+import { url } from "@kit.ArkTS";
+
 @Component
-struct LoginOAuthWebView {
+export struct LoginOAuthWebView {
   @State message: string = 'Hello World';
 
+  @Consume('navPathStack') navPathStack: NavPathStack
+  private webController: WebviewController = new webview.WebviewController()
+
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('LoginOAuthWebViewHelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
-        .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
+    NavDestination(){
+      Web({src: '', controller: this.webController})
+        .javaScriptAccess(true)
+        .onControllerAttached(() => {
+          let OAuthUrl = WebUrlConstants.OAUTH_BASE_URL
+          let scopeStr = WebUrlConstants.SCOPE_LIST.join(" ")
+          OAuthUrl += `&scope=${scopeStr}`
+          try {
+            this.webController.loadUrl(OAuthUrl)
+          }catch (e){
+            console.error(e)
+          }
         })
-        .onClick(() => {
-          this.message = 'Welcome';
+        .onLoadIntercept((event) => {
+          let targetUrl = event.data.getRequestUrl()
+          if(targetUrl.startsWith(WebUrlConstants.OAUTH_REDIRECT_URL)) {
+            let urlParams = new url.URLParams(targetUrl)
+            let code = urlParams.get("code")
+            let error = urlParams.get("error")
+            console.info(`code: ${code}\n error: ${error}`)
+            this.navPathStack.pop()
+          }
+          return false
         })
+
     }
-    .height('100%')
-    .width('100%')
+    .onBackPressed(() => {
+      this.navPathStack.pop()
+      return true
+    })
   }
 }
