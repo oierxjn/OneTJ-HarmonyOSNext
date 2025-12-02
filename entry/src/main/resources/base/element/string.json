@@ -23,14 +23,6 @@
     {
       "name": "Permission_Internet_require_reason",
       "value": "用于验证用户登录，请求云端用户数据"
-    },
-    {
-      "name": "Page_LoginOAuth_WebView_Name",
-      "value": "登录页"
-    },
-    {
-      "name": "Page_Home_Name",
-      "value": "主页"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { LoginOAuthWebView } from './LoginOAuthWebView';
 
-enum PageName{
+export enum PageName{
   HomePage = 'Page_Home',
   LoginOAuthWebView = 'Page_LoginOAuth_WebView'
 }
@@ -27,8 +27,7 @@ struct Login {
         RelativeContainer() {
           Text(this.message)
             .id('title_text')
-            .fontSize($r('app.float.page_text_font_size'))
-            .fontWeight(FontWeight.Bold)
+            .fontSize($r('app.float.page_text_font_size')).fontWeight(FontWeight.Bold)
             .alignRules({
               middle: { anchor: '__container__', align: HorizontalAlign.Center },
               top: { anchor: '__container__', align: VerticalAlign.Top }
@@ -39,8 +38,7 @@ struct Login {
 
           Column(){
             Button($r('app.string.Uni_login'))
-              .fontSize($r('app.float.page_text_normal_size'))
-              .fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),
@@ -52,8 +50,7 @@ struct Login {
                 this.navPathStack.pushPath({name: PageName.LoginOAuthWebView})
               })
             Button($r('app.string.Join_in_group'))
-              .fontSize($r('app.float.page_text_normal_size'))
-              .fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),
@@ -70,12 +67,10 @@ struct Login {
           })
           .width('80%')
         }
-        .height('80%')
-        .width('100%')
+        .height('80%').width('100%')
       }
       .justifyContent(FlexAlign.Center)
-      .width('100%')
-      .height('100%')
+      .width('100%').height('100%')
     }
     .navDestination(this.pageMap)
   }
