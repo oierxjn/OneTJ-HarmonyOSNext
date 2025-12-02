@@ -48,7 +48,7 @@ struct Login {
               })
               .backgroundColor($r('app.color.start_window_button_background'))
               .margin({bottom: "5%",top: "10%"})
-              .onClick(() => {
+              .onClick(async () => {
                 // TODO: 删掉调试
                 let codeData = OAuthCode.code || 1
                 let errorData = OAuthCode.error

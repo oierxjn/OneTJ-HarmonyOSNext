@@ -1,8 +1,14 @@
 export class TokenData{
-  static accessToken: string;
-  static expireTimeSec: bigint;
-  static refreshToken: String;
-  static refreshTokenExpireSec: bigint;
+  static accessToken: string | null;
+  static expireTimeSec: bigint | null;
+  static refreshToken: String | null;
+  static refreshTokenExpireSec: bigint | null;
+  constructor(accessToken: string, expireTimeSec: bigint, refreshToken: string, refreshTokenExpireSec: bigint) {
+    TokenData.accessToken = accessToken;
+    TokenData.expireTimeSec = expireTimeSec;
+    TokenData.refreshToken = refreshToken;
+    TokenData.refreshTokenExpireSec = refreshTokenExpireSec;
+  }
 }
 
 export class OAuthCode{
@@ -17,4 +23,12 @@ export class StudentInfo{
   static secondDeptName :string | null = null;
   static currentGrade :string | null = null;
   static gender :string | null = null ;
+  constructor(studentId: string, studentName: string, deptName: string, secondDeptName: string, currentGrade: string, gender: string) {
+    StudentInfo.studentId = studentId;
+    StudentInfo.studentName = studentName;
+    StudentInfo.deptName = deptName;
+    StudentInfo.secondDeptName = secondDeptName;
+    StudentInfo.currentGrade = currentGrade;
+    StudentInfo.gender = gender;
+  }
 }
