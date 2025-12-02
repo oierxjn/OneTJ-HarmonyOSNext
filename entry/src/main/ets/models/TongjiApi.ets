@@ -1,28 +1,27 @@
-/**
- * 普通消息数据
- */
-export class CommonMsgData{
-  id: number;
-  title: string;
-  publishTime: string;
-  constructor(id: number, title: string, publishTime: string) {
-    this.id = id;
-    this.title = title;
-    this.publishTime = publishTime;
+import { WebUrlConstants } from "../constants/WebUrlConstants";
+import { http } from "@kit.NetworkKit";
+import { TokenData } from "./UserModel";
+
+
+class TongjiApi {
+
+  static authorizationHeader : Record<string, string>;
+
+  getStudentInfo(): void {
+    let baseUrl = WebUrlConstants.GET_STUDENT_INFO_URL
+    let httpRequest = http.createHttp()
+    httpRequest.request(baseUrl, {
+      header : TongjiApi.authorizationHeader
+    },(err: BusinessError, response: http.HttpResponse) =>{
+      // TODO: 数据处理与存储
+    })
+  }
+
+  constructor() {
+    TongjiApi.authorizationHeader = {
+      'Authorization' : `Bearer ${TokenData.accessToken}`
+    }
   }
 }
 
-/**
- * 详细消息数据
- */
-export class DetailMsgData{
-  content: string | null;
-  // TODO: Attachments
-  constructor(content: string | null) {
-    this.content = content;
-  }
-}
-
-export class TongjiApi {
-
-}
+export let tongjiApi = new TongjiApi();

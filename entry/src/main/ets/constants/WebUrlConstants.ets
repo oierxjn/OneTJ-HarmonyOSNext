@@ -24,4 +24,5 @@ export class WebUrlConstants {
     "rt_onetongji_msg_list",
     "rt_onetongji_msg_detail",
   ]
+  public static readonly GET_STUDENT_INFO_URL = `${this.BASE_URL}/v1/dc/user/student_info`
 }

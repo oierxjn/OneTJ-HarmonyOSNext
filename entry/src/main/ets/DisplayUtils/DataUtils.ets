@@ -4,7 +4,7 @@
  * @author oierxjn
  * @template T -数据源类型
  */
-class ListDataSource<T> implements IDataSource{
+export class ListDataSource<T> implements IDataSource{
   listeners: DataChangeListener[] = [];
   list: T[] = [];
 
@@ -67,5 +67,30 @@ class ListDataSource<T> implements IDataSource{
     this.listeners.forEach((listener) => {
       listener.onDatasetChange(operations)
     })
+  }
+}
+
+/**
+ * 普通消息数据
+ */
+export class CommonMsgData{
+  id: number;
+  title: string;
+  publishTime: string;
+  constructor(id: number, title: string, publishTime: string) {
+    this.id = id;
+    this.title = title;
+    this.publishTime = publishTime;
+  }
+}
+
+/**
+ * 详细消息数据
+ */
+export class DetailMsgData{
+  content: string | null;
+  // TODO: Attachments
+  constructor(content: string | null) {
+    this.content = content;
   }
 }

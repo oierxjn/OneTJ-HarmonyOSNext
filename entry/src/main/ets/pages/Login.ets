@@ -1,3 +1,5 @@
+import { OAuthCode } from '../models/UserModel';
+import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
 
 export enum PageName{
@@ -15,7 +17,7 @@ struct Login {
   @Builder
   pageMap(name: string){
     if(name == PageName.HomePage){
-      // TODO: HomePage
+      Home()
     }
     if(name == PageName.LoginOAuthWebView){
       LoginOAuthWebView()
@@ -47,7 +49,16 @@ struct Login {
               .backgroundColor($r('app.color.start_window_button_background'))
               .margin({bottom: "5%",top: "10%"})
               .onClick(() => {
-                this.navPathStack.pushPath({name: PageName.LoginOAuthWebView})
+                // TODO: 删掉调试
+                let codeData = OAuthCode.code || 1
+                let errorData = OAuthCode.error
+                if(codeData != null){
+                  console.log("code获取完成")
+                  this.navPathStack.pushPath({name: PageName.HomePage})
+                }else{
+                  console.error(errorData)
+                  this.navPathStack.pushPath({name: PageName.LoginOAuthWebView})
+                }
               })
             Button($r('app.string.Join_in_group'))
               .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
