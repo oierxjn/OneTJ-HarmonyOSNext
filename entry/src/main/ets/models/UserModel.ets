@@ -1,9 +1,10 @@
 export class TokenData{
   static accessToken: string | null;
-  static expireTimeSec: bigint | null;
+  static expireTimeSec: number | null;
   static refreshToken: String | null;
-  static refreshTokenExpireSec: bigint | null;
-  constructor(accessToken: string, expireTimeSec: bigint, refreshToken: string, refreshTokenExpireSec: bigint) {
+  static refreshTokenExpireSec: number | null;
+  static isFetched: boolean = false;
+  constructor(accessToken: string, expireTimeSec: number, refreshToken: string, refreshTokenExpireSec: number) {
     TokenData.accessToken = accessToken;
     TokenData.expireTimeSec = expireTimeSec;
     TokenData.refreshToken = refreshToken;

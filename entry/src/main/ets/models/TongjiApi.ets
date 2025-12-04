@@ -33,7 +33,7 @@ class TongjiApi {
 
   /**
    * 拿code换token
-   * @param code
+   * @param code 从授权页面获取的授权码
    * @returns
    */
   async code2token(code: string): Promise<boolean> {
@@ -57,17 +57,34 @@ class TongjiApi {
         extraData: formBody
       })
       console.debug(`请求成功：${response.responseCode}\n内容：${response.result}`)
+      let result = this.processTokenFromResponse(response.result as string)
+      return result
     }catch (e) {
       console.error(`错误：${e}`)
     }
     return false
   }
 
-  constructor() {
-    TongjiApi.authorizationHeader = {
-      'Authorization' : `Bearer ${TokenData.accessToken}`
+  private processTokenFromResponse(str: string): boolean{
+    let tokenData: Object | null;
+    try{
+      tokenData = JSON.parse(str);
+      let accessToken:string = (tokenData as object)?.['access_token']
+      let expiresIn:number = (tokenData as object)?.['expires_in']
+      let refreshToken:string = (tokenData as object)?.['refresh_token']
+      let refreshTokenExpireSec:number = (tokenData as object)?.['refresh_expires_in']
+      TokenData.accessToken = accessToken;
+      TokenData.expireTimeSec = expiresIn;
+      TokenData.refreshToken = refreshToken;
+      TokenData.refreshTokenExpireSec = refreshTokenExpireSec;
+    }catch (e){
+      console.error(`错误：${e}`)
+      return false
     }
+    TokenData.isFetched = true;
+    return true
   }
+
 }
 
 export let tongjiApi = new TongjiApi();

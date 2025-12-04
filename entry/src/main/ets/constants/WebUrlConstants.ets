@@ -1,7 +1,7 @@
 export class WebUrlConstants {
   public static readonly BASE_URL = "https://api.tongji.edu.cn"
   public static readonly CLIENT_ID = "authorization-xxb-onedottongji-yuchen"
-  public static readonly OAUTH_REDIRECT_URL = "onetj://fakeredir.gardilily.com"
+  public static readonly OAUTH_REDIRECT_URL = "onetj://fakeredir.jkljkluiouio.top"
   public static readonly OAUTH_AUTHORIZE_ENDPOINT = this.BASE_URL + "/keycloak/realms/OpenPlatform/protocol/openid-connect/auth"
   public static readonly OAUTH_BASE_URL =
     this.OAUTH_AUTHORIZE_ENDPOINT

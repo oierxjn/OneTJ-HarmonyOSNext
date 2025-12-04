@@ -1,3 +1,4 @@
+import { tongjiApi } from '../models/TongjiApi';
 import { OAuthCode } from '../models/UserModel';
 import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
@@ -60,8 +61,7 @@ struct Login {
               .backgroundColor($r('app.color.start_window_button_background'))
               .margin({bottom: "5%",top: "10%"})
               .onClick(async () => {
-                // TODO: 删掉调试
-                let codeData = OAuthCode.code || 1
+                let codeData = OAuthCode.code
                 let errorData = OAuthCode.error
                 if(codeData != null){
                   console.log("code获取完成")
@@ -93,6 +93,16 @@ struct Login {
       }
       .justifyContent(FlexAlign.Center)
       .width('100%').height('100%')
+      .onVisibleAreaChange([0.0, 1.0], async (isExpend, _) => {
+        if(isExpend){
+          if(OAuthCode.isFetched){
+            let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code ?? '')
+            if(enterHome){
+              this.navPathStack.pushPath({name: PageName.HomePage})
+            }
+          }
+        }
+      })
     }
     .navDestination(this.pageMap)
   }
