@@ -1,9 +1,12 @@
 import { WebUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
 import { TokenData } from "./UserModel";
+import { preferences } from "@kit.ArkData";
+import { distributedKVStore } from '@kit.ArkData'
 
 class TongjiApi {
 
+  static sharePreference: preferences.Preferences;
   static authorizationHeader : Record<string, string>;
 
   static postHeader : Record<string, string> = {
@@ -54,7 +57,8 @@ class TongjiApi {
     try{
       response = await httpRequest.request(baseUrl, {
         method: http.RequestMethod.POST,
-        extraData: formBody
+        extraData: formBody,
+        header: TongjiApi.postHeader
       })
       console.debug(`请求成功：${response.responseCode}\n内容：${response.result}`)
       let result = this.processTokenFromResponse(response.result as string)
@@ -62,7 +66,15 @@ class TongjiApi {
     }catch (e) {
       console.error(`错误：${e}`)
     }
+    TongjiApi.authorizationHeader = {
+      'Authorization': `Bearer ${TokenData.accessToken}`
+    }
     return false
+  }
+
+  // TODO
+  async refreshAccessToken(): Promise<void> {
+
   }
 
   private processTokenFromResponse(str: string): boolean{
@@ -85,6 +97,13 @@ class TongjiApi {
     return true
   }
 
+  async initSharePreference(context: Context){
+    try {
+      TongjiApi.sharePreference = await preferences.getPreferences(context, 'TongjiApi')
+    }catch (e){
+      console.error(`错误：${e}`)
+    }
+  }
 }
 
 export let tongjiApi = new TongjiApi();

@@ -1,3 +1,40 @@
+import { distributedKVStore } from "@kit.ArkData";
+import { bundleManager } from "@kit.AbilityKit";
+
+export let kvManager: distributedKVStore.KVManager | undefined = undefined;
+
+/**
+ * 异步初始化KV数据库管理器
+ *
+ * @param context UI上下文
+ * @returns 是否初始化完成
+ */
+export async function initKVManager(context: Context): Promise<boolean> {
+  let appID: string;
+  let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
+  try {
+    let bundleInfo = await bundleManager.getBundleInfoForSelf(bundleFlags)
+    appID = bundleInfo.name;
+    if(appID == null){
+      throw new Error('获取到空值')
+    }
+  } catch (e){
+    console.error(`获取应用ID错误：${e}`)
+    return false
+  }
+  const kvManagerConfig: distributedKVStore.KVManagerConfig = {
+    context: context,
+    bundleName: appID
+  }
+  try {
+    kvManager = distributedKVStore.createKVManager(kvManagerConfig);
+  } catch (err) {
+    console.error(`数据库管理器初始化错误：${err}`)
+    return false
+  }
+  return true
+}
+
 /**
  * 泛型懒加载数据提供类型
  *

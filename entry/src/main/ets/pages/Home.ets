@@ -9,13 +9,16 @@ export struct Home {
   @State arr: ListDataSource<number> = new ListDataSource([1,2,3,4,5,6,9])
   @State testCount: number = 0
 
-
+  async aboutToAppear(): Promise<void> {
+    
+  }
 
   build() {
     NavDestination(){
       Column(){
         Row(){
-          Text('一统同济Home')
+          Image($rawfile('fluentemoji/banana_color.svg'))
+            .width('30%')
           Text(this.testCount.toString())
         }
         .height('30%')

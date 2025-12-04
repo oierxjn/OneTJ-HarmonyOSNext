@@ -1,3 +1,4 @@
+
 export class TokenData{
   static accessToken: string | null;
   static expireTimeSec: number | null;
@@ -9,6 +10,12 @@ export class TokenData{
     TokenData.expireTimeSec = expireTimeSec;
     TokenData.refreshToken = refreshToken;
     TokenData.refreshTokenExpireSec = refreshTokenExpireSec;
+  }
+  static loadFromKV(){
+    // TODO
+  }
+  static clearFromKV(){
+    // TODO
   }
 }
 
