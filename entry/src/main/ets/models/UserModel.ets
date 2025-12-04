@@ -14,6 +14,7 @@ export class TokenData{
 export class OAuthCode{
   static code: string | null = null;
   static error: string | null = null;
+  static isFetched: boolean = false;
 }
 
 export class StudentInfo{

@@ -12,6 +12,7 @@ export enum PageName{
 struct Login {
   @State message: Resource | string = $r('app.string.EntryAbility_label');
 
+  @State testCount: number = 0
   @Provide('navPathStack') navPathStack: NavPathStack = new NavPathStack()
 
   @Builder
@@ -23,10 +24,20 @@ struct Login {
       LoginOAuthWebView()
     }
   }
+
+  onPageShow(): void {
+    this.testCount += 1
+  }
+
   build() {
     Navigation(this.navPathStack){
       Column() {
         RelativeContainer() {
+          Text(this.testCount.toString())
+            .alignRules({
+              middle: {anchor: '__container__', align: HorizontalAlign.Center},
+              top: {anchor: 'title_text', align: VerticalAlign.Top}
+            })
           Text(this.message)
             .id('title_text')
             .fontSize($r('app.float.page_text_font_size')).fontWeight(FontWeight.Bold)

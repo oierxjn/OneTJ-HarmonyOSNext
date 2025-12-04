@@ -7,13 +7,16 @@ export struct Home {
   @Consume('navPathStack') navPathStack: NavPathStack
 
   @State arr: ListDataSource<number> = new ListDataSource([1,2,3,4,5,6,9])
+  @State testCount: number = 0
+
+
 
   build() {
     NavDestination(){
       Column(){
         Row(){
           Text('一统同济Home')
-
+          Text(this.testCount.toString())
         }
         .height('30%')
         Divider()
