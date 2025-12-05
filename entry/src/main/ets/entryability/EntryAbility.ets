@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { distributedKVStore } from '@kit.ArkData';
 import { initKVManager } from '../DisplayUtils/DataUtils';
+import { StudentInfo, TokenData } from '../models/UserModel';
 
 const DOMAIN = 0x0000;
 
@@ -16,7 +17,10 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     setTimeout(async () => {
       if(await initKVManager(this.context)){
-        // TODO
+        let TokenDataTask = TokenData.initKV()
+        let StudentInfoTask = StudentInfo.initKV()
+
+        await Promise.all([TokenDataTask, StudentInfoTask])
       }
     })
   }

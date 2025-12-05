@@ -1,6 +1,6 @@
 import { WebUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
-import { TokenData } from "./UserModel";
+import { StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 
@@ -15,6 +15,7 @@ class TongjiApi {
 
   /**
    * 获取学生的基础信息
+   * 获取后会存入数据类中，不会存入数据库
    *
    * @returns -boolean，返回true表示请求成功，并保存在数据类中
    */
@@ -26,7 +27,22 @@ class TongjiApi {
       response = await httpRequest.request(baseUrl, {
         header : TongjiApi.authorizationHeader
       })
-      // TODO: 数据处理和储存
+      let studentInfo = JSON.parse(response.result as string)
+
+      let studentId = (studentInfo as object)?.['userId'];
+      let studentName = (studentInfo as object)?.['name'];
+      let deptName = (studentInfo as object)?.['deptName'];
+      let secondDeptName = (studentInfo as object)?.['secondDeptName'];
+      let currentGrade = (studentInfo as object)?.['currentGrade'];
+      let gender = (studentInfo as object)?.['sexCode'];
+      StudentInfo.storeStudentInfo(
+        studentId!!,
+        studentName!!,
+        deptName!!,
+        secondDeptName!!,
+        currentGrade!!,
+        gender!!
+      )
       return true
     }catch (e){
       console.error(`错误：${e}`)
@@ -36,6 +52,7 @@ class TongjiApi {
 
   /**
    * 拿code换token
+   * token获取成功后会存储在数据类中，不会存入数据库
    * @param code 从授权页面获取的授权码
    * @returns
    */
@@ -62,12 +79,15 @@ class TongjiApi {
       })
       console.debug(`请求成功：${response.responseCode}\n内容：${response.result}`)
       let result = this.processTokenFromResponse(response.result as string)
-      return result
+      if(result){
+        await TokenData.storeIntoKV()
+        TongjiApi.authorizationHeader = {
+          'Authorization': `Bearer ${TokenData.accessToken}`
+        }
+        return true
+      }
     }catch (e) {
       console.error(`错误：${e}`)
-    }
-    TongjiApi.authorizationHeader = {
-      'Authorization': `Bearer ${TokenData.accessToken}`
     }
     return false
   }
@@ -85,16 +105,17 @@ class TongjiApi {
       let expiresIn:number = (tokenData as object)?.['expires_in']
       let refreshToken:string = (tokenData as object)?.['refresh_token']
       let refreshTokenExpireSec:number = (tokenData as object)?.['refresh_expires_in']
-      TokenData.accessToken = accessToken;
-      TokenData.expireTimeSec = expiresIn;
-      TokenData.refreshToken = refreshToken;
-      TokenData.refreshTokenExpireSec = refreshTokenExpireSec;
+      TokenData.storeTokenData(
+        accessToken!!,
+        expiresIn!!,
+        refreshToken!!,
+        refreshTokenExpireSec!!
+      )
+      return true
     }catch (e){
       console.error(`错误：${e}`)
-      return false
     }
-    TokenData.isFetched = true;
-    return true
+    return false
   }
 
   async initSharePreference(context: Context){
