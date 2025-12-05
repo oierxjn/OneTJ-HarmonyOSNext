@@ -96,9 +96,11 @@ struct Login {
       .onVisibleAreaChange([0.0, 1.0], async (isExpend, _) => {
         if(isExpend){
           if(OAuthCode.isFetched){
-            let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code ?? '')
+            let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code!!)
             if(enterHome){
               this.navPathStack.pushPath({name: PageName.HomePage})
+            }else{
+              OAuthCode.isFetched = false
             }
           }
         }
