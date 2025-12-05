@@ -1,7 +1,7 @@
 
 
 @Component
-export struct InfoCard {
+export struct CourseInfoCard {
   @State info: string = "Info"
   build() {
     Row() {
@@ -24,5 +24,34 @@ export struct InfoCard {
     .height('100%')
     .backgroundColor('#35253033')
     .borderRadius('5%')
+  }
+}
+
+@Preview
+@Component
+export struct MsgInfoCard {
+  @State title: string = "Info"
+  @State time: string = 'Time'
+
+  build() {
+    Column() {
+      Column(){
+        Text(this.title)
+          .fontSize(16)
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+      Blank()
+      Column(){
+        Text(this.time)
+          .fontSize(16)
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.End)
+    }
+    .width('100%')
+    .height('100%')
+    .border({width: 1, radius: '5%'})
+    .padding({top: 5, bottom: 5, left: 10, right: 10})
   }
 }

@@ -45,7 +45,6 @@ struct Login {
 
     let result = await Promise.all([this.autoLogin(), asyncSleep(AUTO_LOGIN_DELAY)])
     if(result[0]){
-      console.debug("调试：自动登录成功")
       this.navPathStack.pushPath({name: PageName.HomePage})
     }else{
       this.loginButtonText = $r('app.string.Uni_login')

@@ -48,8 +48,6 @@ export class TokenData{
     TokenData.isFetched = true
 
     tongjiApi.initAuthorizationHeader()
-
-    console.debug(`调试：储存完成：\n${updateTime}\n${expireTimeSec}\n${TokenData.refreshTokenExpireSec}`)
   }
   static async storeIntoKV(){
     try {

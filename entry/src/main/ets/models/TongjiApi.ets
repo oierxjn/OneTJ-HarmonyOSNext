@@ -3,6 +3,7 @@ import { http } from "@kit.NetworkKit";
 import { StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
+import { ErrorCode } from "@kit.AbilityKit";
 
 class TongjiApi {
 
@@ -27,8 +28,8 @@ class TongjiApi {
       response = await httpRequest.request(baseUrl, {
         header : TongjiApi.authorizationHeader
       })
-      let studentInfo: Object = JSON.parse(response.result as string)
-
+      let responseData = this.responseToDataArray(response.result as string)
+      let studentInfo = responseData[0]
       let studentId: string = (studentInfo as object)?.['userId'];
       let studentName: string = (studentInfo as object)?.['name'];
       let deptName: string = (studentInfo as object)?.['deptName'];
@@ -43,6 +44,7 @@ class TongjiApi {
         currentGrade!!,
         gender!!
       )
+      console.debug(`调试：学生信息请求完成\n${studentId}\n${studentName}\n`)
       return true
     }catch (e){
       console.error(`错误：${e}`)
@@ -51,6 +53,35 @@ class TongjiApi {
       httpRequest.destroy()
     }
   }
+
+  /**
+   * 从响应内容的 `data` 中提取第一个元素
+   *
+   * @see responseToDataArray
+   *
+   * @param jsonStr 需要转换的响应内容
+   * @returns
+   */
+  responseToSingleData(jsonStr: string): Object{
+    let responseData = this.responseToDataArray(jsonStr)
+    return responseData[0]
+  }
+
+  /**
+   * 专门为同济开放平台设计的data提取
+   *
+   * 响应码不为 `A00000` 的时候会直接抛出对应的响应码
+   * @param jsonStr 需要转换的响应内容
+   * @returns 响应的data数组
+   */
+  responseToDataArray(jsonStr: string): Array<Object>{
+    let jsonObj: Object = JSON.parse(jsonStr)
+    let responseCode: string = (jsonObj as object)?.['code']
+    if(responseCode != 'A00000')throw new Error(`响应码错误：${responseCode}`)
+    let responseData: Array<Object> = (jsonObj as object)?.['data']
+    return responseData
+  }
+
 
   /**
    * 拿code换token
@@ -102,7 +133,6 @@ class TongjiApi {
    * @returns
    */
   async refreshAccessToken(): Promise<boolean> {
-    console.debug(`调试：刷新令牌是否有效：${tongjiApi.isRefreshTokenAvailable()}`)
     if(!tongjiApi.isRefreshTokenAvailable())return false
 
     let httpRequest = http.createHttp()
@@ -138,14 +168,15 @@ class TongjiApi {
 
   isTokenAvailable(): boolean{
     let currentTime: number = Date.now()
+    let lastUpdateTime: number = TokenData.updateTime
     let tokenExpireTime: number = TokenData.expireTimeSec!!
-    return currentTime / 1000 + 10 < tokenExpireTime
+    return (currentTime - lastUpdateTime) / 1000 < tokenExpireTime
   }
   isRefreshTokenAvailable(): boolean{
-    // TODO BUG 时间间隔
     let currentTime: number = Date.now()
+    let lastUpdateTime: number = TokenData.updateTime
     let refreshTokenExpireTime: number = TokenData.refreshTokenExpireSec!!
-    return currentTime / 1000 + 10 < refreshTokenExpireTime
+    return (currentTime - lastUpdateTime) / 1000 < refreshTokenExpireTime
   }
 
   private processTokenFromResponse(str: string): boolean{
