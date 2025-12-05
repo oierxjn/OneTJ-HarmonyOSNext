@@ -1,5 +1,6 @@
 import { distributedKVStore } from "@kit.ArkData";
 import { kvManager } from "../DisplayUtils/DataUtils";
+import { tongjiApi } from "./TongjiApi";
 
 const KVConfig: distributedKVStore.Options = {
   encrypt: true,
@@ -30,6 +31,14 @@ export class TokenData{
 
   static KVStore: distributedKVStore.SingleKVStore | undefined;
 
+  /**
+   * 建议用储存函数储存token数据
+   * @param accessToken
+   * @param expireTimeSec
+   * @param refreshToken
+   * @param refreshTokenExpireSec
+   * @param updateTime
+   */
   static storeTokenData(accessToken: string, expireTimeSec: number, refreshToken: string, refreshTokenExpireSec: number, updateTime?: number) {
     TokenData.accessToken = accessToken;
     TokenData.expireTimeSec = expireTimeSec;
@@ -37,6 +46,10 @@ export class TokenData{
     TokenData.refreshTokenExpireSec = refreshTokenExpireSec;
     TokenData.updateTime = updateTime ?? Date.now()
     TokenData.isFetched = true
+
+    tongjiApi.initAuthorizationHeader()
+
+    console.debug(`调试：储存完成：\n${updateTime}\n${expireTimeSec}\n${TokenData.refreshTokenExpireSec}`)
   }
   static async storeIntoKV(){
     try {
@@ -45,9 +58,11 @@ export class TokenData{
       let refreshTokenTask = TokenData.KVStore!!.put(TokenData.refreshTokenKey, TokenData.refreshToken!!)
       let refreshTokenExpireSecTask = TokenData.KVStore!!.put(TokenData.refreshTokenExpireSecKey, TokenData.refreshTokenExpireSec!!)
       let updateTimeTask = TokenData.KVStore!!.put(TokenData.updateTimeKey, TokenData.updateTime!!)
+
       await Promise.all([accessTokenTask, expireTimeSecTask, refreshTokenTask, refreshTokenExpireSecTask, updateTimeTask])
+      console.debug("Token数据库储存完成")
     } catch (e){
-      console.error(e)
+      console.error(`Token数据库储存失败：\n${e}`)
     }
   }
   static async loadFromKV(){
@@ -70,7 +85,7 @@ export class TokenData{
         updateTime!!
       )
     } catch (e){
-      console.error(e)
+      console.error(`加载Token数据库时发生错误：${e}`)
     }
   }
   static async clearFromKV(){

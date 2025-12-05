@@ -1,5 +1,7 @@
 import { InfoCard } from '../components/InfoCard'
 import { ListDataSource } from '../DisplayUtils/DataUtils'
+import { tongjiApi } from '../models/TongjiApi'
+import { StudentInfo } from '../models/UserModel'
 
 
 @Component
@@ -7,11 +9,15 @@ export struct Home {
   @Consume('navPathStack') navPathStack: NavPathStack
 
   @State arr: ListDataSource<number> = new ListDataSource([1,2,3,4,5,6,9])
-  @State testCount: number = 0
+
+  @State studentName: string = '黄泽华'
 
   async aboutToAppear(): Promise<void> {
-    
+    if(await tongjiApi.getStudentInfo()){
+      this.studentName = StudentInfo.studentName!!
+    }
   }
+
 
   build() {
     NavDestination(){
@@ -19,9 +25,10 @@ export struct Home {
         Row(){
           Image($rawfile('fluentemoji/banana_color.svg'))
             .width('30%')
-          Text(this.testCount.toString())
+          Text(this.studentName)
+            .fontSize(30)
         }
-        .height('30%')
+        .height('30%').width('100%')
         Divider()
           .margin({top: '5', bottom: '5'})
         List(){
