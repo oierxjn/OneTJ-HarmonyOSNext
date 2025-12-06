@@ -27,8 +27,7 @@ struct Login {
   pageMap(name: string){
     if(name == PageName.HomePage){
       Home()
-    }
-    if(name == PageName.LoginOAuthWebView){
+    }else if(name == PageName.LoginOAuthWebView){
       LoginOAuthWebView()
     }
   }

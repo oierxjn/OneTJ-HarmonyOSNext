@@ -1,15 +1,15 @@
 import { CourseInfoCard, MsgInfoCard } from '../components/InfoCard'
 import { buildAlertDialog } from '../DisplayUtils/AlertDialogUtils'
-import { ListDataSource } from '../DisplayUtils/DataUtils'
+import { CommonMsgData, ListDataSource, MsgListDataSource } from '../DisplayUtils/DataUtils'
 import { tongjiApi } from '../models/TongjiApi'
-import { SchoolCalendarInfo, StudentInfo } from '../models/UserModel'
+import { MsgList, SchoolCalendarInfo, StudentInfo } from '../models/UserModel'
 
 
 @Component
 export struct Home {
   @Consume('navPathStack') navPathStack: NavPathStack
 
-  @State arr: ListDataSource<number> = new ListDataSource([1,2,3,4,5,6,9])
+  @State commonMsgList: MsgListDataSource = new MsgListDataSource()
 
   @State avatarSrc: ResourceStr = $rawfile('fluentemoji/banana_color.svg')
 
@@ -22,7 +22,25 @@ export struct Home {
   async aboutToAppear(): Promise<void> {
     let studentInfoTask = this.createStudentInfoTask()
     let termInfoTask = this.createTermInfoTask()
-    await Promise.all([studentInfoTask, termInfoTask])
+    let msgListTask = this.createMsgListTask()
+
+    await Promise.all([studentInfoTask, termInfoTask, msgListTask])
+  }
+
+  async createMsgListTask(): Promise<void> {
+    if(!MsgList.isFetched){
+      if(!await tongjiApi.getCommonMsgList()) {
+        console.error('获取消息列表失败')
+        return
+      }
+    }
+    try {
+      for(let msg of MsgList.msgArray){
+        this.commonMsgList.push(msg)
+      }
+    } catch (e){
+      console.error(`出现异常：${e}`)
+    }
   }
 
   async createStudentInfoTask(): Promise<void> {
@@ -42,14 +60,14 @@ export struct Home {
     } catch (e){
       console.error(`出现异常：${e}`)
     }
+    await StudentInfo.storeIntoKV()
   }
   async createTermInfoTask(): Promise<void> {
-    console.debug(`调试：进入TermInfoTask`)
     await SchoolCalendarInfo.initKV()
     await SchoolCalendarInfo.loadFromKV()
     if(!SchoolCalendarInfo.isFetched){
       if(!await tongjiApi.getSchoolCalendarInfo()){
-        console.error('调试：获取学期信息失败')
+        console.error('获取学期信息失败')
         return
       }
     }
@@ -58,6 +76,7 @@ export struct Home {
     } catch (e){
       console.error(`出现异常：${e}`)
     }
+    await SchoolCalendarInfo.storeIntoKV()
   }
 
 
@@ -92,10 +111,10 @@ export struct Home {
           .margin({top: '5', bottom: '5'})
           .visibility(Visibility.Hidden)
         List(){
-          LazyForEach(this.arr, (item: number, index: number) => {
+          LazyForEach(this.commonMsgList, (item: CommonMsgData, index: number) => {
             ListItem(){
               Column(){
-                MsgInfoCard({title: `${item.toString()}索引${index}`, time: Date().toString()}).width('100%').height('20%')
+                MsgInfoCard({title: item.title, time: item.publishTime}).width('100%').height('17%')
                 Divider()
                   .margin({top: '5', bottom: '5'})
                   .visibility(Visibility.Hidden)

@@ -1,5 +1,5 @@
 import { distributedKVStore } from "@kit.ArkData";
-import { kvManager } from "../DisplayUtils/DataUtils";
+import { CommonMsgData, kvManager } from "../DisplayUtils/DataUtils";
 import { tongjiApi } from "./TongjiApi";
 
 const KVConfig: distributedKVStore.Options = {
@@ -303,4 +303,10 @@ export class SchoolCalendarInfo {
       console.error(`初始化 SchollCalendar 数据库时发生错误：${e}`)
     }
   }
+}
+
+export class MsgList{
+  static msgArray: CommonMsgData[] = new Array<CommonMsgData>();
+  static updateTime: number = 0;
+  static isFetched: boolean = false;
 }

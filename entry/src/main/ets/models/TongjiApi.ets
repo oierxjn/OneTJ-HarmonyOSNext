@@ -1,9 +1,10 @@
 import { WebUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
-import { SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
+import { MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 import { ErrorCode } from "@kit.AbilityKit";
+import { CommonMsgData } from "../DisplayUtils/DataUtils";
 
 class TongjiApi {
 
@@ -14,6 +15,41 @@ class TongjiApi {
     'Content-Type' : 'application/x-www-form-urlencoded'
   }
 
+
+  /**
+   * 一次性获取接口的所有通知
+   *
+   * @returns
+   */
+  async getCommonMsgList(): Promise<boolean>{
+    let baseUrl = WebUrlConstants.GET_ALL_MSG_LIST_URL
+    let httpRequest = http.createHttp()
+    let response : http.HttpResponse
+    try {
+      response = await httpRequest.request(baseUrl, {
+        header : TongjiApi.authorizationHeader
+      })
+      let responseData = this.responseToData(response.result as string)
+      let msgList: Array<Object> = (responseData as object)?.['list']
+      for (let msg of msgList){
+        let id: number = (msg as object)?.['id']
+        let title: string = (msg as object)?.['title']
+        let publishTime: string = (msg as object)?.['publishTime']
+        MsgList.msgArray.push(new CommonMsgData(
+          id!!,
+          title!!,
+          publishTime!!
+        ))
+      }
+      MsgList.isFetched = true
+      return true
+    } catch (e){
+      console.error(`请求通知列表时发生错误：${e}`)
+      return false
+    } finally {
+      httpRequest.destroy()
+    }
+  }
 
   async getSchoolCalendarInfo(): Promise<boolean>{
     let baseUrl = WebUrlConstants.GET_SCHOOL_CALENDAR_URL

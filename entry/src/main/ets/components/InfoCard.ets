@@ -27,6 +27,10 @@ export struct CourseInfoCard {
   }
 }
 
+function getFoldedText(text: string){
+
+}
+
 @Component({freezeWhenInactive: true})
 export struct MsgInfoCard {
   @Require @State title: string = "Info"

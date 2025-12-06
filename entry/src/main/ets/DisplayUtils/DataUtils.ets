@@ -43,17 +43,19 @@ export async function initKVManager(context: Context): Promise<boolean> {
  */
 export class ListDataSource<T> implements IDataSource{
   listeners: DataChangeListener[] = [];
-  list: T[] = [];
+  dataList: T[] = [];
 
-  constructor(list: T[]){
-    this.list = list;
+  constructor(list?: T[]){
+    if(list != null) {
+      this.dataList = list;
+    }
   }
 
   public totalCount(): number {
-    return this.list.length;
+    return this.dataList.length;
   }
   public getData(index: number): T {
-    return this.list[index];
+    return this.dataList[index];
   }
 
   public registerDataChangeListener(listener: DataChangeListener): void {
@@ -118,6 +120,13 @@ export class CommonMsgData{
     this.id = id;
     this.title = title;
     this.publishTime = publishTime;
+  }
+}
+
+export class MsgListDataSource extends ListDataSource<CommonMsgData> {
+  push(msg: CommonMsgData){
+    this.dataList.push(msg);
+    this.notifyDataAdd(this.dataList.length - 1);
   }
 }
 
