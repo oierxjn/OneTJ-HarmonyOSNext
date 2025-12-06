@@ -1,9 +1,11 @@
 import { CourseInfoCard, MsgInfoCard } from '../components/InfoCard'
 import { buildAlertDialog } from '../DisplayUtils/AlertDialogUtils'
-import { CommonMsgData, ListDataSource, MsgListDataSource } from '../DisplayUtils/DataUtils'
+import { CommonMsgData, ListDataSource, MsgListDataSource, TextSectionAttribute } from '../DisplayUtils/DataUtils'
 import { tongjiApi } from '../models/TongjiApi'
 import { MsgList, SchoolCalendarInfo, StudentInfo } from '../models/UserModel'
 
+
+export let msgTextSectionAttribute: TextSectionAttribute = new TextSectionAttribute()
 
 @Component
 export struct Home {
@@ -20,6 +22,8 @@ export struct Home {
   @State termSimpleName: string = '1919-9178学年度第0学期 第13周'
 
   async aboutToAppear(): Promise<void> {
+    msgTextSectionAttribute.maxLines = 3
+
     let studentInfoTask = this.createStudentInfoTask()
     let termInfoTask = this.createTermInfoTask()
     let msgListTask = this.createMsgListTask()
@@ -114,7 +118,7 @@ export struct Home {
           LazyForEach(this.commonMsgList, (item: CommonMsgData, index: number) => {
             ListItem(){
               Column(){
-                MsgInfoCard({title: item.title, time: item.publishTime}).width('100%').height('17%')
+                MsgInfoCard({title: item.title, time: item.publishTime, msgId: item.id}).width('100%')
                 Divider()
                   .margin({top: '5', bottom: '5'})
                   .visibility(Visibility.Hidden)
@@ -122,6 +126,9 @@ export struct Home {
             }
           })
         }
+        .onAreaChange((_ ,area) => {
+          msgTextSectionAttribute.constraintWidth = Number(area.width) *0.85
+        })
         .height('70%').width('100%')
       }
       .margin({top: '10%', left: '5%', right: '5%'})

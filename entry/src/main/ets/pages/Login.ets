@@ -2,12 +2,14 @@ import { asyncSleep } from '../components/Funcs';
 import { initKVManager } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
 import { OAuthCode, TokenData } from '../models/UserModel';
+import { DetailMsg } from './DetailMsg';
 import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
 
 export enum PageName{
   HomePage = 'Page_Home',
-  LoginOAuthWebView = 'Page_LoginOAuth_WebView'
+  LoginOAuthWebView = 'Page_LoginOAuth_WebView',
+  DetailMsgPage = 'Page_Detail_Msg'
 }
 // TODO 不进行令牌刷新
 const REFRESH_TOKEN: boolean = false
@@ -29,6 +31,8 @@ struct Login {
       Home()
     }else if(name == PageName.LoginOAuthWebView){
       LoginOAuthWebView()
+    }else if(name == PageName.DetailMsgPage){
+      DetailMsg()
     }
   }
 

@@ -134,9 +134,35 @@ export class MsgListDataSource extends ListDataSource<CommonMsgData> {
  * 详细消息数据
  */
 export class DetailMsgData{
-  content: string | null;
-  // TODO: Attachments
+  title: string | undefined | null;
+  content: string | undefined | null;
+
   constructor(content: string | null) {
     this.content = content;
   }
+}
+
+export class TextSectionAttribute {
+  title: ResourceStr = '';
+  maxLines: number;
+  fontColor: ResourceStr;
+  fontSize: Resource | number | string;
+  lineHeight: number;
+  constraintWidth: Resource | number | string;
+
+  constructor(title: ResourceStr = '', maxLines: number = 2, fontColor: ResourceStr = '#000',
+    fontSize: Resource | number | string = '16vp', lineHeight: number = 16,
+    constraintWidth: Resource | number | string = 350) {
+    this.title = title;
+    this.maxLines = maxLines;
+    this.fontColor = fontColor;
+    this.fontSize = fontSize;
+    this.lineHeight = lineHeight;
+    this.constraintWidth = constraintWidth;
+  }
+}
+
+export interface CommonMsgToDetailMsgNavParams{
+  id: number;
+  title: string;
 }

@@ -5,16 +5,35 @@ import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 import { ErrorCode } from "@kit.AbilityKit";
 import { CommonMsgData } from "../DisplayUtils/DataUtils";
+import { BusinessError } from "@kit.BasicServicesKit";
 
 class TongjiApi {
 
   static sharePreference: preferences.Preferences;
-  static authorizationHeader : Record<string, string>;
 
   static postHeader : Record<string, string> = {
     'Content-Type' : 'application/x-www-form-urlencoded'
   }
+  static requestOptions: http.HttpRequestOptions
 
+
+  async getDetailMsg(id: number): Promise<string | null>{
+    let baseUrl = `${WebUrlConstants.GET_MSG_DETAIL_URL}?id=${id}`
+    let httpRequest = http.createHttp()
+    let response : http.HttpResponse
+    try {
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
+      let responseData = this.responseToData(response.result as string)
+      let content: string = (responseData as object)?.['content']
+      return content
+    } catch (e){
+      // let err = e as BusinessError
+      console.error(`请求通知详情时发生错误：${JSON.stringify(e as object)}`)
+      return null
+    } finally {
+      httpRequest.destroy()
+    }
+  }
 
   /**
    * 一次性获取接口的所有通知
@@ -26,9 +45,7 @@ class TongjiApi {
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
-      response = await httpRequest.request(baseUrl, {
-        header : TongjiApi.authorizationHeader
-      })
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
       let responseData = this.responseToData(response.result as string)
       let msgList: Array<Object> = (responseData as object)?.['list']
       for (let msg of msgList){
@@ -56,9 +73,7 @@ class TongjiApi {
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
-      response = await httpRequest.request(baseUrl, {
-        header : TongjiApi.authorizationHeader
-      })
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
       let schoolCalendarInfo: Object = this.responseToData(response.result as string)
       let schoolWeek: string = (schoolCalendarInfo as object)?.['week']
       let simpleName: string = (schoolCalendarInfo as object)?.['simpleName']
@@ -94,9 +109,7 @@ class TongjiApi {
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
-      response = await httpRequest.request(baseUrl, {
-        header : TongjiApi.authorizationHeader
-      })
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
       let responseData = this.responseToDataArray(response.result as string)
       // console.debug(`调试：校历转换结果\n${responseData}`)
       let studentInfo = responseData[0]
@@ -171,7 +184,6 @@ class TongjiApi {
    * @returns
    */
   async code2token(code: string): Promise<boolean> {
-    console.debug("调试：进入code2token")
     let baseUrl = WebUrlConstants.CODE2TOKEN_URL
     let httpRequest = http.createHttp()
     const param: [string, string][] = [
@@ -291,8 +303,11 @@ class TongjiApi {
   }
 
   initAuthorizationHeader(){
-    TongjiApi.authorizationHeader = {
-      'Authorization': `Bearer ${TokenData.accessToken}`
+    TongjiApi.requestOptions = {
+      maxLimit: 100*1024*1024,
+      header: {
+        'Authorization': `Bearer ${TokenData.accessToken}`
+      }
     }
   }
 
