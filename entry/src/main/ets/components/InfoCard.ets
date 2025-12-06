@@ -27,11 +27,10 @@ export struct CourseInfoCard {
   }
 }
 
-@Preview
-@Component
+@Component({freezeWhenInactive: true})
 export struct MsgInfoCard {
-  @State title: string = "Info"
-  @State time: string = 'Time'
+  @Require @State title: string = "Info"
+  @Require @State time: string = 'Time'
 
   build() {
     Column() {

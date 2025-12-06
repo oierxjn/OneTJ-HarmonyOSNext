@@ -9,8 +9,8 @@ export enum PageName{
   HomePage = 'Page_Home',
   LoginOAuthWebView = 'Page_LoginOAuth_WebView'
 }
-
-const REFRESH_TOKEN: boolean = true
+// TODO 不进行令牌刷新
+const REFRESH_TOKEN: boolean = false
 const AUTO_LOGIN_DELAY: number = 0
 
 @Entry

@@ -2,7 +2,7 @@ import { webview } from "@kit.ArkWeb";
 import { WebUrlConstants } from "../constants/WebUrlConstants";
 import { url } from "@kit.ArkTS";
 import { OAuthCode } from "../models/UserModel";
-import { buildAlertDialogParams } from "../DisplayUtils/AlertDialogUtils";
+import { buildAlertDialog } from "../DisplayUtils/AlertDialogUtils";
 
 @Component
 export struct LoginOAuthWebView {
@@ -35,9 +35,7 @@ export struct LoginOAuthWebView {
               OAuthCode.isFetched = true
               this.navPathStack.pop()
             }else{
-              this.getUIContext().showAlertDialog(
-                buildAlertDialogParams(OAuthCode.error ?? '未知错误')
-              )
+              buildAlertDialog(this.getUIContext(), OAuthCode.error)
               console.error(`错误：${OAuthCode.error}`)
             }
           }

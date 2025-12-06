@@ -26,4 +26,5 @@ export class WebUrlConstants {
   ]
   public static readonly GET_STUDENT_INFO_URL = `${this.BASE_URL}/v1/dc/user/student_info`
   public static readonly CODE2TOKEN_URL = `${this.BASE_URL}/v1/token`
+  public static readonly GET_SCHOOL_CALENDAR_URL = `${this.BASE_URL}/v1/rt/onetongji/school_calendar_current_term_calendar`
 }

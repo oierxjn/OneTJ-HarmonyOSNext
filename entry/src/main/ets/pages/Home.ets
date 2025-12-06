@@ -1,7 +1,8 @@
 import { CourseInfoCard, MsgInfoCard } from '../components/InfoCard'
+import { buildAlertDialog } from '../DisplayUtils/AlertDialogUtils'
 import { ListDataSource } from '../DisplayUtils/DataUtils'
 import { tongjiApi } from '../models/TongjiApi'
-import { StudentInfo } from '../models/UserModel'
+import { SchoolCalendarInfo, StudentInfo } from '../models/UserModel'
 
 
 @Component
@@ -16,21 +17,44 @@ export struct Home {
   @State deptName: string = '继续搞事学院'
   @State currentGrade: string = '114514级'
 
-  @State termInfo: string = '1919-9178学年度第0学期 第13周'
+  @State termSimpleName: string = '1919-9178学年度第0学期 第13周'
 
   async aboutToAppear(): Promise<void> {
+    let studentInfoTask = this.createStudentInfoTask()
+    let termInfoTask = this.createTermInfoTask()
+    await Promise.all([studentInfoTask, termInfoTask])
+  }
+
+  async createStudentInfoTask(): Promise<void> {
     await StudentInfo.initKV()
     await StudentInfo.loadFromKV()
     if(!StudentInfo.isFetched){
       if(!await tongjiApi.getStudentInfo()){
         console.error('获取学生信息失败')
+        return
       }
     }
     try {
       this.studentNameAndId = `${StudentInfo.studentName}  ${StudentInfo.studentId}`
       this.deptName = StudentInfo.deptName!!
+      // TODO BUG : 未知Bug，应当在空闲时间上报
       this.currentGrade = StudentInfo.currentGrade + '级'
-      console.debug(`当前年级：${this.currentGrade}`)
+    } catch (e){
+      console.error(`出现异常：${e}`)
+    }
+  }
+  async createTermInfoTask(): Promise<void> {
+    console.debug(`调试：进入TermInfoTask`)
+    await SchoolCalendarInfo.initKV()
+    await SchoolCalendarInfo.loadFromKV()
+    if(!SchoolCalendarInfo.isFetched){
+      if(!await tongjiApi.getSchoolCalendarInfo()){
+        console.error('调试：获取学期信息失败')
+        return
+      }
+    }
+    try {
+      this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
     } catch (e){
       console.error(`出现异常：${e}`)
     }
@@ -58,7 +82,7 @@ export struct Home {
             .height('100%').width('70%')
           }
           .width('90%').height('60%')
-          Text(this.termInfo)
+          Text(this.termSimpleName)
             .fontSize(22)
             .height('20%')
             .margin({bottom: '5%', top: '5%'})
@@ -86,7 +110,6 @@ export struct Home {
     }
     .hideBackButton(true)
     .onBackPressed(() => {
-      // this.navPathStack.pop()
       return true
     })
   }

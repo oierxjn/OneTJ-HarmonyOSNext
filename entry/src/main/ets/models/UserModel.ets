@@ -212,3 +212,95 @@ export class StudentInfo{
     }
   }
 }
+
+export class SchoolCalendarInfo {
+  static calendarId: string | null
+  static year: string | null
+  static term: string | null
+  static schoolWeek: string | null
+  static simpleName: string | null
+  static updateTime: number = 0
+  static isFetched: boolean = false
+
+  static schoolCalendarInfoKey = 'schoolCalendarInfoKey'
+  static calendarIdKey = 'calendarIdKey'
+  static yearKey = 'yearKey'
+  static termKey = 'termKey'
+  static schoolWeekKey = 'schoolWeekKey'
+  static simpleNameKey = 'simpleNameKey'
+  static updateTimeKey = 'updateTimeKey'
+
+  static KVStore: distributedKVStore.SingleKVStore | undefined;
+
+  static storeSchoolCalendarInfo(calendarId: string, year: string, term: string, schoolWeek: string, simpleName: string, updateTime?: number){
+    SchoolCalendarInfo.calendarId = calendarId
+    SchoolCalendarInfo.year = year
+    SchoolCalendarInfo.term = term
+    SchoolCalendarInfo.schoolWeek = schoolWeek
+    SchoolCalendarInfo.simpleName = simpleName
+    SchoolCalendarInfo.updateTime = updateTime ?? Date.now()
+    SchoolCalendarInfo.isFetched = true
+  }
+
+  static async storeIntoKV(){
+    try {
+      let calendarIdTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.calendarIdKey, SchoolCalendarInfo.calendarId!!)
+      let yearTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.yearKey, SchoolCalendarInfo.year!!)
+      let termTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.termKey, SchoolCalendarInfo.term!!)
+      let schoolWeekTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.schoolWeekKey, SchoolCalendarInfo.schoolWeek!!)
+      let simpleNameTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.simpleNameKey, SchoolCalendarInfo.simpleName!!)
+      let updateTimeTask = SchoolCalendarInfo.KVStore!!.put(SchoolCalendarInfo.updateTimeKey, SchoolCalendarInfo.updateTime)
+
+      await Promise.all([calendarIdTask, yearTask, termTask, schoolWeekTask, simpleNameTask, updateTimeTask])
+    } catch (e){
+      console.error(`储存 SchoolCalendar 时发生错误`)
+    }
+  }
+  static async loadFromKV(){
+    try {
+      let calendarIdTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.calendarIdKey)
+      let yearTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.yearKey)
+      let termTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.termKey)
+      let schoolWeekTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.schoolWeekKey)
+      let simpleNameTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.simpleNameKey)
+      let updateTimeTask = SchoolCalendarInfo.KVStore!!.get(SchoolCalendarInfo.updateTimeKey)
+      let calendarId = await calendarIdTask as string
+      let year = await yearTask as string
+      let term = await termTask as string
+      let schoolWeek = await schoolWeekTask as string
+      let simpleName = await simpleNameTask as string
+      let updateTime = await updateTimeTask as number
+      SchoolCalendarInfo.storeSchoolCalendarInfo(
+        calendarId!!,
+        year!!,
+        term!!,
+        schoolWeek!!,
+        simpleName!!,
+        updateTime!!
+      )
+    } catch (e){
+      console.error(`加载 SchollCalendar 数据库时发生错误：${e}`)
+    }
+  }
+  static async clearFromKV(){
+    try {
+      let calendarIdTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.calendarIdKey)
+      let yearTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.yearKey)
+      let termTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.termKey)
+      let schoolWeekTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.schoolWeekKey)
+      let simpleNameTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.simpleNameKey)
+      let updateTimeTask = SchoolCalendarInfo.KVStore!!.delete(SchoolCalendarInfo.updateTimeKey)
+
+      await Promise.all([calendarIdTask, yearTask, termTask, schoolWeekTask, simpleNameTask, updateTimeTask])
+    } catch (e){
+      console.error(`清除 SchollCalendar 数据库时发生错误：${e}`)
+    }
+  }
+  static async initKV(){
+    try {
+      SchoolCalendarInfo.KVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>(SchoolCalendarInfo.schoolCalendarInfoKey, KVConfig)
+    } catch (e) {
+      console.error(`初始化 SchollCalendar 数据库时发生错误：${e}`)
+    }
+  }
+}

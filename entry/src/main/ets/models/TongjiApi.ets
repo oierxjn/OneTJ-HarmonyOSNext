@@ -1,6 +1,6 @@
 import { WebUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
-import { StudentInfo, TokenData } from "./UserModel";
+import { SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 import { ErrorCode } from "@kit.AbilityKit";
@@ -14,8 +14,41 @@ class TongjiApi {
     'Content-Type' : 'application/x-www-form-urlencoded'
   }
 
+
+  async getSchoolCalendarInfo(): Promise<boolean>{
+    let baseUrl = WebUrlConstants.GET_SCHOOL_CALENDAR_URL
+    let httpRequest = http.createHttp()
+    let response : http.HttpResponse
+    try {
+      response = await httpRequest.request(baseUrl, {
+        header : TongjiApi.authorizationHeader
+      })
+      let schoolCalendarInfo: Object = this.responseToData(response.result as string)
+      let schoolWeek: string = (schoolCalendarInfo as object)?.['week']
+      let simpleName: string = (schoolCalendarInfo as object)?.['simpleName']
+      let schoolCalendar: object = (schoolCalendarInfo as object)?.['schoolCalendar']
+      let calendarId: string = schoolCalendar?.['id']
+      let year: string = schoolCalendar?.['year']
+      let term: string = schoolCalendar?.['term']
+
+      SchoolCalendarInfo.storeSchoolCalendarInfo(
+        calendarId!!,
+        year!!,
+        term!!,
+        schoolWeek!!,
+        simpleName!!,
+      )
+      return true
+    } catch (e){
+      console.error(`请求校历时发生错误：${e}`)
+      return false
+    } finally {
+      httpRequest.destroy()
+    }
+  }
+
   /**
-   * 获取学生的基础信息
+   * 拉取学生的基础信息
    * 获取后会存入数据类中，不会存入数据库
    *
    * @returns -boolean，返回true表示请求成功，并保存在数据类中
@@ -29,6 +62,7 @@ class TongjiApi {
         header : TongjiApi.authorizationHeader
       })
       let responseData = this.responseToDataArray(response.result as string)
+      // console.debug(`调试：校历转换结果\n${responseData}`)
       let studentInfo = responseData[0]
       let studentId: string = (studentInfo as object)?.['userId'];
       let studentName: string = (studentInfo as object)?.['name'];
@@ -44,7 +78,6 @@ class TongjiApi {
         currentGrade!!,
         gender!!
       )
-      console.debug(`调试：学生信息请求完成\n${studentId}\n${studentName}\n`)
       return true
     }catch (e){
       console.error(`错误：${e}`)
@@ -53,6 +86,21 @@ class TongjiApi {
       httpRequest.destroy()
     }
   }
+
+  /**
+   * 专门为同济开放平台设计的通用data提取
+   *
+   * @param jsonStr
+   * @returns
+   */
+  responseToData(jsonStr: string): Object{
+    let jsonObj: Object = JSON.parse(jsonStr)!!
+    let responseCode: string = (jsonObj as object)?.['code']
+    if(responseCode != 'A00000')throw new Error(`响应码错误：${responseCode}`)
+    let responseData: Object = (jsonObj as object)?.['data']
+    return responseData
+  }
+
 
   /**
    * 从响应内容的 `data` 中提取第一个元素
@@ -68,18 +116,15 @@ class TongjiApi {
   }
 
   /**
-   * 专门为同济开放平台设计的data提取
-   *
+   * 专门为同济开放平台设计的**数组类**data提取
+   * 注意：只有返回数组类的时候才需要用这个
    * 响应码不为 `A00000` 的时候会直接抛出对应的响应码
    * @param jsonStr 需要转换的响应内容
    * @returns 响应的data数组
    */
   responseToDataArray(jsonStr: string): Array<Object>{
-    let jsonObj: Object = JSON.parse(jsonStr)
-    let responseCode: string = (jsonObj as object)?.['code']
-    if(responseCode != 'A00000')throw new Error(`响应码错误：${responseCode}`)
-    let responseData: Array<Object> = (jsonObj as object)?.['data']
-    return responseData
+    let responseData = this.responseToData(jsonStr)
+    return responseData as Array<Object>
   }
 
 
@@ -128,9 +173,9 @@ class TongjiApi {
 
   /**
    * 刷新token
-   *
    * 参考OneTJ项目，济星云项目
-   * @returns
+   * 请求前将会判断 `refresh_token` 是否可用
+   * @returns 刷新成功或否
    */
   async refreshAccessToken(): Promise<boolean> {
     if(!tongjiApi.isRefreshTokenAvailable())return false
@@ -162,6 +207,8 @@ class TongjiApi {
       }
     } catch (e){
       console.error(`错误：${e}`)
+    } finally {
+      httpRequest.destroy()
     }
     return false
   }
