@@ -1,3 +1,4 @@
+import { DashBoard } from '../components/DashBoard'
 import { CourseInfoCard, MsgInfoCard } from '../components/InfoCard'
 import { buildAlertDialog } from '../DisplayUtils/AlertDialogUtils'
 import { CommonMsgData, ListDataSource, MsgListDataSource, TextSectionAttribute } from '../DisplayUtils/DataUtils'
@@ -13,7 +14,7 @@ export struct Home {
 
   @State commonMsgList: MsgListDataSource = new MsgListDataSource()
 
-  @State avatarSrc: ResourceStr = $rawfile('fluentemoji/banana_color.svg')
+  @State avatarSrc: ResourceStr = $rawfile('fluentemoji-png/sleeping_face_3d.png')
 
   @State studentNameAndId: string = '黄泽华'
   @State deptName: string = '继续搞事学院'
@@ -83,6 +84,7 @@ export struct Home {
     await SchoolCalendarInfo.storeIntoKV()
   }
 
+  titleFontSize: number = 25;
 
   build() {
     NavDestination(){
@@ -90,16 +92,17 @@ export struct Home {
         Column(){
           Row(){
             Image(this.avatarSrc)
-              .width('30%')
+              .width('25%')
+            Blank()
             Column(){
               Text(this.studentNameAndId)
-                .fontSize(27)
+                .fontSize(this.titleFontSize)
               Blank()
               Text(this.deptName)
-                .fontSize(27)
+                .fontSize(this.titleFontSize)
               Blank()
               Text(this.currentGrade)
-                .fontSize(27)
+                .fontSize(this.titleFontSize)
             }
             .alignItems(HorizontalAlign.Start)
             .height('100%').width('70%')
@@ -111,10 +114,11 @@ export struct Home {
             .margin({bottom: '5%', top: '5%'})
         }
         .height('30%').width('100%')
-        Divider()
-          .margin({top: '5', bottom: '5'})
-          .visibility(Visibility.Hidden)
         List(){
+          ListItem(){
+            DashBoard()
+              .width('100%').height('40%')
+          }
           LazyForEach(this.commonMsgList, (item: CommonMsgData, index: number) => {
             ListItem(){
               Column(){

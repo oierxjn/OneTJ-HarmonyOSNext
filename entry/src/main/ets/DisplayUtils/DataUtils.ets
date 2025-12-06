@@ -166,3 +166,27 @@ export interface CommonMsgToDetailMsgNavParams{
   id: number;
   title: string;
 }
+
+export enum HomeFunctions {
+  NONE = 'none',
+  SETTINGS = 'settings',
+  ABOUT = 'about',
+  GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY = 'graduate_student_time_table_single_day',
+  LOGOUT = 'logout',
+  JOIN_QQ_GROUP = 'join_qq_group',
+  EXP_CALC = 'experimental_calculation'
+}
+
+export class HomeFunctionItem {
+  uid: HomeFunctions;
+  name: string;
+  icon: ResourceStr;
+  constructor(uid: HomeFunctions, name: string, icon: ResourceStr) {
+    this.uid = uid;
+    this.name = name;
+    this.icon = icon;
+  }
+  static keyGenerator(item: HomeFunctionItem): string {
+    return item.uid;
+  }
+}
