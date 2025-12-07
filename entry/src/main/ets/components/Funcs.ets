@@ -67,6 +67,8 @@ export class Downloader{
 }
 
 
+export let wallpaperPixelMap: image.PixelMap | undefined;
+
 export async function checkOldWallpaper(context: UIContext): Promise<boolean>{
   const wallpaperFilePath = context.getHostContext()?.cacheDir + '/wallpaper.jpg'
   try{
@@ -80,7 +82,6 @@ export async function checkOldWallpaper(context: UIContext): Promise<boolean>{
   return false
 }
 
-
 export async function fetchNewWallpaper(context: UIContext): Promise<boolean>{
   const wallpaperFilePath = context.getHostContext()?.cacheDir + '/wallpaper.jpg'
   let downloader = new Downloader()
@@ -92,12 +93,13 @@ export async function fetchNewWallpaper(context: UIContext): Promise<boolean>{
     let responseCode = await downloader.get(getWallpaperUrl())
     console.debug(`调试：壁纸下载完成`)
     let pixelMap = await image.createImageSource(downloader.finalArrayBuffer).createPixelMapUsingAllocator(
-      null,
+      {  },
       image.AllocatorType.DMA
     )
+    wallpaperPixelMap = pixelMap
     return true
   } catch (e){
-    console.error(`获取壁纸时发生错误：${(e as BusinessError).message}`)
+    console.error(`调试：获取壁纸时发生错误：${(e as BusinessError).message}\n${(e as BusinessError).stack}`)
     return false
   } finally {
     downloader.destroy()
