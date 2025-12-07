@@ -34,8 +34,8 @@ struct Login {
   @State backgroundOpacity: number = 0;
 
   @State colorTheme: Array<Array<[string, number]>> = [
-    [['#FFFFFFFF', 0.0], ['#FFFFFFFF', 1]],
-    [['#ff0631f5', 0.0], ['#ff922626', 1]]
+    [['#FF000000', 0.0], ['#FF000000', 1]],
+    [['#ff32d043', 0.0], ['#ffff4136', 1]]
   ]
 
   @Provide('navPathStack') navPathStack: NavPathStack = new NavPathStack()

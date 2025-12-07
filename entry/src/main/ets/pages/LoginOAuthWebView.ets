@@ -30,8 +30,8 @@ export struct LoginOAuthWebView {
   async aboutToAppear() {
     if(tongjiApi.switchRequire){
       await webview.WebCookieManager.clearAllCookies()
-      this.appearDone = true
     }
+    this.appearDone = true
   }
 
   build() {
@@ -67,7 +67,6 @@ export struct LoginOAuthWebView {
           .WebStyles()
       }
     }
-    // .backgroundImage()
     .onBackPressed(() => {
       this.navPathStack.pop()
       return true
