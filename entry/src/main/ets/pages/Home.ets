@@ -24,9 +24,8 @@ export struct Home {
 
   async aboutToAppear(): Promise<void> {
     msgTextSectionAttribute.maxLines = 3
-
     let studentInfoTask = this.createStudentInfoTask()
-    let termInfoTask = this.createTermInfoTask()
+    let termInfoTask = this.createTermInfoTask() // TODO 不进行学期刷新
     let msgListTask = this.createMsgListTask()
 
     await Promise.all([studentInfoTask, termInfoTask, msgListTask])

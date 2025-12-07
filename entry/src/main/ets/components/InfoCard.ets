@@ -72,6 +72,7 @@ export struct MsgInfoCard {
     .onClick(() => {
       this.navPathStack.pushPath({name: PageName.DetailMsgPage, param: Object({id: this.msgId, title: this.title})})
     })
+    .clickEffect({ level: ClickEffectLevel.HEAVY })
     .width('100%')
     .height(this.textHeight)
     .border({width: 1, radius: '5%'})

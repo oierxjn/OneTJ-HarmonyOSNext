@@ -1,5 +1,5 @@
 import { distributedKVStore } from "@kit.ArkData";
-import { bundleManager } from "@kit.AbilityKit";
+import { ability, Ability, bundleManager, UIAbility, common } from "@kit.AbilityKit";
 
 export let kvManager: distributedKVStore.KVManager | undefined = undefined;
 
