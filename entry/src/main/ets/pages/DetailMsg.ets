@@ -14,6 +14,9 @@ enum LoadMode{
 
 let isTempHtmlDownLoaded: boolean = false;
 
+let buttonBackgroundColor = $r('sys.color.ohos_id_color_floating_button_shadow_start')
+let normalTextColor = $r('sys.color.ohos_id_color_text_primary')
+
 async function downloadHTML(htmlStr: string, uiContext: UIContext){
   let tempDir = uiContext.getHostContext()?.tempDir
   let tempFileDir: string = tempDir + '/temp.html'
@@ -51,6 +54,8 @@ function WebStyles(){
   .javaScriptAccess(true)
   .allowWindowOpenMethod(true)
   .mixedMode(MixedMode.All)
+  .darkMode(WebDarkMode.Auto)
+  .forceDarkAccess(true)
 }
 
 @Component
@@ -76,9 +81,11 @@ export struct DetailMsg {
       if (this.loadMode & LoadMode.Fetching) {
         Text('详情拉取中')
           .fontSize(30)
+          .fontColor(normalTextColor)
       } else if (this.loadMode & LoadMode.Rendering) {
         Text('网页渲染中')
           .fontSize(30)
+          .fontColor(normalTextColor)
       } else {
         Row(){
           Button(`刷新`)
@@ -92,8 +99,8 @@ export struct DetailMsg {
               color: '#99545300'
             })
             .width('50%')
-            .fontColor('#565300')
-            .backgroundColor('#450000FF')
+            .fontColor(normalTextColor)
+            .backgroundColor(buttonBackgroundColor)
           Button(`用其他应用打开`)
             .onClick(async () => {
               await downloadHTML(this.htmlStr, this.getUIContext())
@@ -103,6 +110,7 @@ export struct DetailMsg {
               style: BorderStyle.Solid,
               color: '#99545300'
             })
+            .fontColor(normalTextColor)
             .width('50%')
             .backgroundColor('#45000000')
         }.width('100%')

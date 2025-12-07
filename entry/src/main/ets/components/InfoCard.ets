@@ -75,7 +75,11 @@ export struct MsgInfoCard {
     .clickEffect({ level: ClickEffectLevel.HEAVY })
     .width('100%')
     .height(this.textHeight)
-    .border({width: 1, radius: '5%'})
+    .border({
+      width: 1,
+      radius: '5%',
+      color: $r('sys.color.ohos_id_color_foreground')
+    })
     .padding({top: 5, bottom: 5, left: 10, right: 10})
   }
 }

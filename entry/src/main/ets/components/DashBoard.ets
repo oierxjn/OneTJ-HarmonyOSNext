@@ -1,7 +1,40 @@
 import { HomeFunctionItem, HomeFunctions } from "../DisplayUtils/DataUtils"
+import { UIContext } from "@kit.ArkUI"
+import { tongjiApi } from "../models/TongjiApi"
+
+// TODO 主要功能
+let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
+  [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: () => {
+    console.log('今日课程')
+  },
+  [HomeFunctions.NONE]: (): void => {
+    return
+  },
+  [HomeFunctions.SETTINGS]: (): void => {
+    throw new Error("Function not implemented.")
+  },
+  [HomeFunctions.ABOUT]: (): void => {
+    throw new Error("Function not implemented.")
+  },
+  [HomeFunctions.LOGOUT]: (): void => {
+    setTimeout(async () =>{
+      tongjiApi.switchRequire = true
+      await tongjiApi.clearLoginData()
+    })
+  },
+  [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {
+    throw new Error("Function not implemented.")
+  },
+  [HomeFunctions.EXP_CALC]: (): void => {
+    throw new Error("Function not implemented.")
+  }
+}
+
 
 @Component
 export struct DashBoard {
+
+  @Consume('navPathStack') navPathStack: NavPathStack
 
   HomeFuncList: HomeFunctionItem[] = new Array<HomeFunctionItem>()
   async aboutToAppear() {
@@ -21,13 +54,17 @@ export struct DashBoard {
           Column(){
             Image(item.icon)
               .width('70%')
-              .supportSvg2(true)
+              .draggable(false)
             Text(item.name)
               .fontSize(20)
               .height('20%')
-
           }
-        }.height('50%')
+          .onClick(() => {
+            HomeFunctionMap[item.uid](this.navPathStack, this.getUIContext())
+          })
+        }
+        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .height('50%')
       })
     }
     .columnsTemplate('1fr 1fr 1fr')

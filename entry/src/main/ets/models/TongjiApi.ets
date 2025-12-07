@@ -1,4 +1,4 @@
-import { WebUrlConstants } from "../constants/WebUrlConstants";
+import { TongjiApiUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
 import { MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
@@ -16,9 +16,23 @@ class TongjiApi {
   }
   static requestOptions: http.HttpRequestOptions
 
+  switchRequire: boolean = false
+
+  async clearLoginData(){
+    try{
+      let TokenDataTask = TokenData.clearFromKV()
+      let StudentInfoTask = StudentInfo.clearFromKV()
+      await Promise.all([TokenDataTask, StudentInfoTask])
+    } catch (e){
+      console.error(`清除数据库数据时发生错误：${e}`)
+    } finally {
+      TokenData.isFetched = false
+      StudentInfo.isFetched = false
+    }
+  }
 
   async getDetailMsg(id: number): Promise<string | null>{
-    let baseUrl = `${WebUrlConstants.GET_MSG_DETAIL_URL}?id=${id}`
+    let baseUrl = `${TongjiApiUrlConstants.GET_MSG_DETAIL_URL}?id=${id}`
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
@@ -41,7 +55,7 @@ class TongjiApi {
    * @returns
    */
   async getCommonMsgList(): Promise<boolean>{
-    let baseUrl = WebUrlConstants.GET_ALL_MSG_LIST_URL
+    let baseUrl = TongjiApiUrlConstants.GET_ALL_MSG_LIST_URL
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
@@ -69,7 +83,7 @@ class TongjiApi {
   }
 
   async getSchoolCalendarInfo(): Promise<boolean>{
-    let baseUrl = WebUrlConstants.GET_SCHOOL_CALENDAR_URL
+    let baseUrl = TongjiApiUrlConstants.GET_SCHOOL_CALENDAR_URL
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
@@ -105,7 +119,7 @@ class TongjiApi {
    * @returns -boolean，返回true表示请求成功，并保存在数据类中
    */
   async getStudentInfo(): Promise<boolean>{
-    let baseUrl = WebUrlConstants.GET_STUDENT_INFO_URL
+    let baseUrl = TongjiApiUrlConstants.GET_STUDENT_INFO_URL
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
@@ -184,13 +198,13 @@ class TongjiApi {
    * @returns
    */
   async code2token(code: string): Promise<boolean> {
-    let baseUrl = WebUrlConstants.CODE2TOKEN_URL
+    let baseUrl = TongjiApiUrlConstants.CODE2TOKEN_URL
     let httpRequest = http.createHttp()
     const param: [string, string][] = [
       ["grant_type", "authorization_code"],
-      ["client_id", WebUrlConstants.CLIENT_ID],
+      ["client_id", TongjiApiUrlConstants.CLIENT_ID],
       ["code", code],
-      ["redirect_uri", WebUrlConstants.OAUTH_REDIRECT_URL]
+      ["redirect_uri", TongjiApiUrlConstants.OAUTH_REDIRECT_URL]
     ]
     let formBody = param
       .map((item) => {
@@ -229,11 +243,11 @@ class TongjiApi {
     if(!tongjiApi.isRefreshTokenAvailable())return false
 
     let httpRequest = http.createHttp()
-    let baseUrl = WebUrlConstants.CODE2TOKEN_URL
+    let baseUrl = TongjiApiUrlConstants.CODE2TOKEN_URL
     let param = [
       ["refresh_token", TokenData.refreshToken],
       ["grant_type", "refresh_token"],
-      ["client_id", WebUrlConstants.CLIENT_ID]
+      ["client_id", TongjiApiUrlConstants.CLIENT_ID]
     ]
     let formBody = param
       .map((item) => {

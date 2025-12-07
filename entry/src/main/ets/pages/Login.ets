@@ -44,7 +44,6 @@ struct Login {
       console.error('KVManager初始化失败')
       return
     }
-    await TokenData.initKV()
 
     let result = await Promise.all([this.autoLogin(), asyncSleep(AUTO_LOGIN_DELAY)])
     if(result[0]){
@@ -53,19 +52,19 @@ struct Login {
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
     }
+
   }
 
   async autoLogin(refreshFlag: boolean = REFRESH_TOKEN): Promise<boolean>{
     try {
-      if(await initKVManager(this.getUIContext().getHostContext()!!)){
-        await TokenData.loadFromKV()
-        if(!TokenData.isFetched){
-          throw new Error('未获取到Token')
-        }
-        if(refreshFlag){
-          return await tongjiApi.refreshAccessToken()
-        }else return tongjiApi.isTokenAvailable()
+      await TokenData.initKV()
+      await TokenData.loadFromKV()
+      if(!TokenData.isFetched){
+        throw new Error('未获取到Token')
       }
+      if(refreshFlag){
+        return await tongjiApi.refreshAccessToken()
+      }else return tongjiApi.isTokenAvailable()
     } catch (e){
       console.error(e)
     }

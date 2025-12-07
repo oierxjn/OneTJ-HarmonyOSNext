@@ -1,4 +1,4 @@
-export class WebUrlConstants {
+export class TongjiApiUrlConstants {
   public static readonly BASE_URL = "https://api.tongji.edu.cn"
   public static readonly CLIENT_ID = "authorization-xxb-onedottongji-yuchen"
   public static readonly OAUTH_REDIRECT_URL = "onetj://fakeredir.jkljkluiouio.top"
@@ -29,4 +29,10 @@ export class WebUrlConstants {
   public static readonly GET_SCHOOL_CALENDAR_URL = `${this.BASE_URL}/v1/rt/onetongji/school_calendar_current_term_calendar`
   public static readonly GET_ALL_MSG_LIST_URL = `${this.BASE_URL}/v1/rt/onetongji/msg_list?pageNum_=1&pageSize_=9999&total=0`
   public static readonly GET_MSG_DETAIL_URL = `${this.BASE_URL}/v1/rt/onetongji/msg_detail`
+}
+
+export class XJNUrlConstants{
+  public static readonly BASE_URL = 'http://47.116.117.37/'
+  public static readonly GET_LANDSCAPE_WALLPAPER_URL = `${this.BASE_URL}landscape`
+  public static readonly GET_PORTRAIT_WALLPAPER_URL = `${this.BASE_URL}portrait`
 }
