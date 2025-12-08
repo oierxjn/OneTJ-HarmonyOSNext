@@ -20,7 +20,9 @@ export struct Home {
   @State deptName: string = '继续搞事学院'
   @State currentGrade: string = '114514级'
 
+  @State isInfoBoardFolded: boolean = false
   @State termSimpleName: string = '1919-9178学年度第0学期 第13周'
+
 
   async aboutToAppear(): Promise<void> {
     msgTextSectionAttribute.maxLines = 3
@@ -107,16 +109,24 @@ export struct Home {
             .height('100%').width('70%')
           }
           .width('90%').height('60%')
+          .opacity(this.isInfoBoardFolded? 0 : 1)
+          .animation({})
           Text(this.termSimpleName)
             .fontSize(22)
             .height('20%')
             .margin({bottom: '5%', top: '5%'})
+            .animation({})
         }
         .height('30%').width('100%')
+        .translate({y: this.isInfoBoardFolded? '-80%' : 0})
+        .animation({duration: 1000})
+        .onClick(() => {
+          this.isInfoBoardFolded = !this.isInfoBoardFolded
+        })
         List(){
           ListItem(){
             DashBoard()
-              .width('100%').height('40%')
+              .width('100%').height('30%')
           }
           LazyForEach(this.commonMsgList, (item: CommonMsgData, index: number) => {
             ListItem(){
@@ -129,10 +139,12 @@ export struct Home {
             }
           })
         }
+        .translate({y: this.isInfoBoardFolded? '-28%' : 0})
+        .animation({duration: 1000})
         .onAreaChange((_ ,area) => {
           msgTextSectionAttribute.constraintWidth = Number(area.width) *0.85
         })
-        .height('70%').width('100%')
+        .height('100%').width('100%')
       }
       .margin({top: '10%', left: '5%', right: '5%'})
       .width('90%').height('100%')

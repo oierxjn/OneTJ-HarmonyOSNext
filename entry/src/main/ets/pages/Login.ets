@@ -68,7 +68,6 @@ struct Login {
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
     }
-
   }
 
   async autoLogin(refreshFlag: boolean = REFRESH_TOKEN): Promise<boolean>{
@@ -95,6 +94,14 @@ struct Login {
       console.debug(`调试：壁纸设置完成`)
     }
   }
+
+  async onPageShow(){
+    if(tongjiApi.switchRequire){
+      this.loginButtonText = $r('app.string.Uni_login')
+      this.allowLogin = true
+    }
+  }
+
 
   build() {
     Stack(){

@@ -16,10 +16,11 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.ABOUT]: (): void => {
     throw new Error("Function not implemented.")
   },
-  [HomeFunctions.LOGOUT]: (): void => {
+  [HomeFunctions.LOGOUT]: (navPathStack): void => {
     setTimeout(async () =>{
       tongjiApi.switchRequire = true
       await tongjiApi.clearLoginData()
+      navPathStack.pop()
     })
   },
   [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {

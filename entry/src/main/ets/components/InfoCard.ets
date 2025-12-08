@@ -36,7 +36,7 @@ function getFoldedText(text: string){
 function animatableHeight(height: string | number){
   .width(height)
 }
-let minTextHeight: string = '17%'
+let minTextHeight: number = 100
 
 
 @Component({freezeWhenInactive: true})
@@ -47,7 +47,7 @@ export struct MsgInfoCard {
 
   @State isFolded: boolean = true
   @State textMaxLines: number = 3
-  @State textHeight: string = minTextHeight
+  @State textHeight: number = minTextHeight
 
   @Consume('navPathStack') navPathStack: NavPathStack
 
