@@ -19,53 +19,45 @@ function WebStyles(){
   .forceDarkAccess(true)
 }
 
+export let loginWebviewTag: string = 'LoginWebView'
+
 @Component
 export struct LoginOAuthWebView {
   @State message: string = 'Hello World';
-  @State appearDone: boolean = false;
 
   @Consume('navPathStack') navPathStack: NavPathStack
-  private webController: WebviewController = new webview.WebviewController()
-
-  async aboutToAppear() {
-    if(tongjiApi.switchRequire){
-      await webview.WebCookieManager.clearAllCookies()
-    }
-    this.appearDone = true
-  }
+  private webController: WebviewController = new webview.WebviewController(loginWebviewTag)
 
   build() {
     NavDestination(){
-      if(this.appearDone){
-        Web({src: '', controller: this.webController})
-          .onControllerAttached(() => {
-            let OAuthUrl = TongjiApiUrlConstants.OAUTH_BASE_URL
-            let scopeStr = TongjiApiUrlConstants.SCOPE_LIST.join(" ")
-            OAuthUrl += `&scope=${scopeStr}`
-            try {
-              this.webController.loadUrl(OAuthUrl)
-            }catch (e){
-              console.error(e)
+      Web({src: '', controller: this.webController})
+        .onControllerAttached(() => {
+          let OAuthUrl = TongjiApiUrlConstants.OAUTH_BASE_URL
+          let scopeStr = TongjiApiUrlConstants.SCOPE_LIST.join(" ")
+          OAuthUrl += `&scope=${scopeStr}`
+          try {
+            this.webController.loadUrl(OAuthUrl)
+          }catch (e){
+            console.error(e)
+          }
+        })
+        .onLoadIntercept((event) => {
+          let targetUrl = event.data.getRequestUrl()
+          if(targetUrl.startsWith(TongjiApiUrlConstants.OAUTH_REDIRECT_URL)) {
+            let urlParams = new url.URLParams(targetUrl)
+            OAuthCode.code = urlParams.get("code")
+            OAuthCode.error = urlParams.get("error")
+            if(OAuthCode.code){
+              OAuthCode.isFetched = true
+              this.navPathStack.pop()
+            }else{
+              buildAlertDialog(this.getUIContext(), OAuthCode.error)
+              console.error(`错误：${OAuthCode.error}`)
             }
-          })
-          .onLoadIntercept((event) => {
-            let targetUrl = event.data.getRequestUrl()
-            if(targetUrl.startsWith(TongjiApiUrlConstants.OAUTH_REDIRECT_URL)) {
-              let urlParams = new url.URLParams(targetUrl)
-              OAuthCode.code = urlParams.get("code")
-              OAuthCode.error = urlParams.get("error")
-              if(OAuthCode.code){
-                OAuthCode.isFetched = true
-                this.navPathStack.pop()
-              }else{
-                buildAlertDialog(this.getUIContext(), OAuthCode.error)
-                console.error(`错误：${OAuthCode.error}`)
-              }
-            }
-            return false
-          })
-          .WebStyles()
-      }
+          }
+          return false
+        })
+        .WebStyles()
     }
     .onBackPressed(() => {
       this.navPathStack.pop()

@@ -52,6 +52,7 @@ struct Login {
   }
 
   async aboutToAppear(): Promise<void> {
+    console.debug(`调试：进入Appear`)
     this.loginButtonText = '自动登录中'
     this.allowLogin = false
 
@@ -95,12 +96,6 @@ struct Login {
     }
   }
 
-  async onPageShow(){
-    if(tongjiApi.switchRequire){
-      this.loginButtonText = $r('app.string.Uni_login')
-      this.allowLogin = true
-    }
-  }
 
 
   build() {
@@ -170,6 +165,11 @@ struct Login {
         .justifyContent(FlexAlign.Center)
         .width('100%').height('100%')
         .onVisibleAreaChange([0.0, 1.0], async (isExpend, _) => {
+          if(tongjiApi.switchRequire){
+            console.debug(`调试：准备手动登录`)
+            this.loginButtonText = $r('app.string.Uni_login')
+            this.allowLogin = true
+          }
           if(isExpend){
             if(OAuthCode.isFetched){
               let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code!!)

@@ -190,3 +190,13 @@ export class HomeFunctionItem {
     return item.uid;
   }
 }
+
+export class GlobalContext{
+  private static context: Context;
+  static initContext(context: Context){
+    GlobalContext.context = context
+  }
+  static getContext(): Context{
+    return GlobalContext.context;
+  }
+}

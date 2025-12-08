@@ -1,6 +1,8 @@
 import { HomeFunctionItem, HomeFunctions } from "../DisplayUtils/DataUtils"
 import { UIContext } from "@kit.ArkUI"
 import { tongjiApi } from "../models/TongjiApi"
+import { webview } from "@kit.ArkWeb"
+import { loginWebviewTag } from "../pages/LoginOAuthWebView"
 
 // TODO 主要功能
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
@@ -19,8 +21,10 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.LOGOUT]: (navPathStack): void => {
     setTimeout(async () =>{
       tongjiApi.switchRequire = true
-      await tongjiApi.clearLoginData()
+      let clearLoginDataTask = tongjiApi.clearLoginData()
+      let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
       navPathStack.pop()
+      await Promise.all([clearLoginDataTask, clearLoginCookie])
     })
   },
   [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {
