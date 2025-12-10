@@ -305,6 +305,34 @@ export class SchoolCalendarInfo {
   }
 }
 
+export class CourseInfo{
+  name: string;
+  timeStart: number;
+  timeEnd: number;
+  courseNumber: string;
+  teacher: string;
+  room: string;
+  constructor(
+    name: string = '',
+    timeStart: number = 1,
+    timeEnd: number = 1,
+    courseNumber: string = '',
+    teacher: string = '',
+    room: string =''
+  ){
+    this.name = name
+    this.timeStart = timeStart
+    this.timeEnd = timeEnd
+    this.courseNumber = courseNumber
+    this.teacher = teacher
+    this.room = room
+  }
+}
+
+export class CourseInfoList{
+  // TODO
+}
+
 export class MsgList{
   static msgArray: CommonMsgData[] = new Array<CommonMsgData>();
   static updateTime: number = 0;

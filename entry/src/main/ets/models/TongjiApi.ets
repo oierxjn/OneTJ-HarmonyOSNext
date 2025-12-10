@@ -31,6 +31,22 @@ class TongjiApi {
     }
   }
 
+  async getCourseInfoList(): Promise<Object[] | null>{
+    let baseUrl = TongjiApiUrlConstants.GET_STUDENT_TIMETABLE_URL;
+    let httpRequest = http.createHttp()
+    let response : http.HttpResponse
+    try {
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
+      let responseData = this.responseToDataArray(response.result as string)
+      return responseData
+    } catch (e){
+      console.error(`请求课程表时发生错误：${(e as BusinessError).message}`)
+      return null
+    } finally {
+      httpRequest.destroy()
+    }
+  }
+
   async getDetailMsg(id: number): Promise<string | null>{
     let baseUrl = `${TongjiApiUrlConstants.GET_MSG_DETAIL_URL}?id=${id}`
     let httpRequest = http.createHttp()
@@ -41,7 +57,6 @@ class TongjiApi {
       let content: string = (responseData as object)?.['content']
       return content
     } catch (e){
-      // let err = e as BusinessError
       console.error(`请求通知详情时发生错误：${JSON.stringify(e as object)}`)
       return null
     } finally {
