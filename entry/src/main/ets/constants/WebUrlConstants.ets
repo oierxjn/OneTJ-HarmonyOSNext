@@ -33,7 +33,7 @@ export class TongjiApiUrlConstants {
 }
 
 export class XJNUrlConstants{
-  public static readonly BASE_URL = 'http://47.116.117.37/'
+  public static readonly BASE_URL = 'https://onetj.jkljkluiouio.top/'
   public static readonly GET_LANDSCAPE_WALLPAPER_URL = `${this.BASE_URL}landscape`
   public static readonly GET_PORTRAIT_WALLPAPER_URL = `${this.BASE_URL}portrait`
 }

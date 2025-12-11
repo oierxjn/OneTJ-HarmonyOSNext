@@ -329,9 +329,12 @@ export class CourseInfo{
   }
 }
 
-export class CourseInfoList{
-  // TODO
+class CourseInfoList{
+  courseInfoArray: CourseInfo[] = new Array<CourseInfo>();
+  updateTime: number = 0;
+  isFetched: boolean = false;
 }
+export let courseInfoList: CourseInfoList = new CourseInfoList();
 
 export class MsgList{
   static msgArray: CommonMsgData[] = new Array<CommonMsgData>();

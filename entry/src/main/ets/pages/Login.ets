@@ -88,11 +88,11 @@ struct Login {
   }
 
   async setWallPaper(){
-    console.debug(`调试：准备开始设置壁纸`)
+    console.debug(`准备开始设置壁纸`)
     if(await fetchNewWallpaper(this.getUIContext())){
       this.wallpaper = wallpaperPixelMap!!
       this.backgroundOpacity = 1
-      console.debug(`调试：壁纸设置完成`)
+      console.debug(`壁纸设置完成`)
     }
   }
 
@@ -164,27 +164,6 @@ struct Login {
         }
         .justifyContent(FlexAlign.Center)
         .width('100%').height('100%')
-        .onVisibleAreaChange([0.0, 1.0], async (isExpend, _) => {
-          if(tongjiApi.switchRequire){
-            console.debug(`调试：准备手动登录`)
-            this.loginButtonText = $r('app.string.Uni_login')
-            this.allowLogin = true
-          }
-          if(isExpend){
-            if(OAuthCode.isFetched){
-              let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code!!)
-              if(enterHome){
-                setTimeout(() => {
-                  this.navPathStack.pushPath({name: PageName.HomePage})
-                })
-              }else{
-                OAuthCode.isFetched = false
-              }
-            }
-          }
-        })
-        // Column()
-        // .width('100%').height('100%')
       }
       .backgroundColor('#00000000')
       .navDestination(this.pageMap)

@@ -4,6 +4,7 @@ import { url } from "@kit.ArkTS";
 import { OAuthCode } from "../models/UserModel";
 import { buildAlertDialog } from "../DisplayUtils/AlertDialogUtils";
 import { tongjiApi } from "../models/TongjiApi";
+import { PageName } from "./Login";
 
 @Extend(Web)
 function WebStyles(){
@@ -50,6 +51,15 @@ export struct LoginOAuthWebView {
             if(OAuthCode.code){
               OAuthCode.isFetched = true
               this.navPathStack.pop()
+              // 将页面跳转抛出
+              setTimeout(async () => {
+                let enterHome: boolean = await tongjiApi.code2token(OAuthCode.code!!)
+                if(enterHome){
+                  this.navPathStack.pushPath({name: PageName.HomePage})
+                }else{
+                  OAuthCode.isFetched = false
+                }
+              })
             }else{
               buildAlertDialog(this.getUIContext(), OAuthCode.error)
               console.error(`错误：${OAuthCode.error}`)
