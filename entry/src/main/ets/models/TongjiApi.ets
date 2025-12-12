@@ -1,6 +1,6 @@
 import { TongjiApiUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
-import { MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
+import { CourseInfo, CourseInfoList, MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 import { ErrorCode } from "@kit.AbilityKit";
@@ -31,17 +31,18 @@ class TongjiApi {
     }
   }
 
-  async getCourseInfoList(): Promise<Object[] | null>{
+  async getCourseInfoList(): Promise<boolean>{
     let baseUrl = TongjiApiUrlConstants.GET_STUDENT_TIMETABLE_URL;
     let httpRequest = http.createHttp()
     let response : http.HttpResponse
     try {
       response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
       let responseData = this.responseToDataArray(response.result as string)
-      return responseData
+      CourseInfoList.processCourseInfoData(responseData)
+      return true
     } catch (e){
       console.error(`请求课程表时发生错误：${(e as BusinessError).message}`)
-      return null
+      return false
     } finally {
       httpRequest.destroy()
     }

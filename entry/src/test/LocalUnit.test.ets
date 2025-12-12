@@ -2,7 +2,7 @@ import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from
 
 export default function localUnitTest() {
   describe('localUnitTest', () => {
-    // Defines a test suite. Two parameters are supported: test suite name and test suite function.
+    // Defines a test suite. Two parameters are supported: test suite courseName and test suite function.
     beforeAll(() => {
       // Presets an action, which is performed only once before all test cases of the test suite start.
       // This API supports only one parameter: preset action function.
@@ -22,7 +22,7 @@ export default function localUnitTest() {
       // This API supports only one parameter: clear action function.
     });
     it('assertContain', 0, () => {
-      // Defines a test case. This API supports three parameters: test case name, filter parameter, and test case function.
+      // Defines a test case. This API supports three parameters: test case courseName, filter parameter, and test case function.
       let a = 'abc';
       let b = 'b';
       // Defines a variety of assertion methods, which are used to declare expected boolean conditions.

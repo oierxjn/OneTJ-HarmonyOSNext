@@ -3,7 +3,7 @@ import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from
 
 export default function abilityTest() {
   describe('ActsAbilityTest', () => {
-    // Defines a test suite. Two parameters are supported: test suite name and test suite function.
+    // Defines a test suite. Two parameters are supported: test suite courseName and test suite function.
     beforeAll(() => {
       // Presets an action, which is performed only once before all test cases of the test suite start.
       // This API supports only one parameter: preset action function.
@@ -23,7 +23,7 @@ export default function abilityTest() {
       // This API supports only one parameter: clear action function.
     })
     it('assertContain', 0, () => {
-      // Defines a test case. This API supports three parameters: test case name, filter parameter, and test case function.
+      // Defines a test case. This API supports three parameters: test case courseName, filter parameter, and test case function.
       hilog.info(0x0000, 'testTag', '%{public}s', 'it begin');
       let a = 'abc';
       let b = 'b';

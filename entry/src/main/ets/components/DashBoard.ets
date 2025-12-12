@@ -3,11 +3,12 @@ import { UIContext } from "@kit.ArkUI"
 import { tongjiApi } from "../models/TongjiApi"
 import { webview } from "@kit.ArkWeb"
 import { loginWebviewTag } from "../pages/LoginOAuthWebView"
+import { PageName } from "../pages/Login"
 
 // TODO 主要功能
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
-  [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: () => {
-    console.log('今日课程')
+  [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: (navPathStack) => {
+    navPathStack.pushPath({name: PageName.StudentTimeTablePage})
   },
   [HomeFunctions.NONE]: (): void => {
     return

@@ -6,11 +6,13 @@ import { DetailMsg } from './DetailMsg';
 import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
 import image from '@ohos.multimedia.image';
+import { StudentTimeTable } from './StudentTimeTable';
 
 export enum PageName{
   HomePage = 'Page_Home',
   LoginOAuthWebView = 'Page_LoginOAuth_WebView',
-  DetailMsgPage = 'Page_Detail_Msg'
+  DetailMsgPage = 'Page_Detail_Msg',
+  StudentTimeTablePage = 'Page_Student_Time_Table',
 }
 // TODO 不进行令牌刷新
 const REFRESH_TOKEN: boolean = false
@@ -48,6 +50,8 @@ struct Login {
       LoginOAuthWebView()
     }else if(name == PageName.DetailMsgPage){
       DetailMsg()
+    }else if(name == PageName.StudentTimeTablePage){
+      StudentTimeTable()
     }
   }
 

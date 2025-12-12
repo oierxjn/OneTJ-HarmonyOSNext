@@ -306,35 +306,73 @@ export class SchoolCalendarInfo {
 }
 
 export class CourseInfo{
-  name: string;
+  courseName: string;
   timeStart: number;
   timeEnd: number;
-  courseNumber: string;
   teacher: string;
   room: string;
+  weeks: Array<number>;
   constructor(
-    name: string = '',
+    courseName: string = '',
     timeStart: number = 1,
     timeEnd: number = 1,
-    courseNumber: string = '',
     teacher: string = '',
-    room: string =''
+    room: string ='',
+    weeks: Array<number>
   ){
-    this.name = name
+    this.courseName = courseName
     this.timeStart = timeStart
     this.timeEnd = timeEnd
-    this.courseNumber = courseNumber
     this.teacher = teacher
     this.room = room
+    this.weeks = weeks
   }
 }
 
-class CourseInfoList{
-  courseInfoArray: CourseInfo[] = new Array<CourseInfo>();
-  updateTime: number = 0;
-  isFetched: boolean = false;
+export class CourseInfoList{
+  static courseInfoArray: CourseInfo[] = new Array<CourseInfo>();
+  static updateTime: number = 0;
+  static isFetched: boolean = false;
+
+  static courseInfoArrayKey: string = 'courseInfoArrayKey';
+  static updateTimeKey: string = 'updateTimeKey';
+
+  static KVStore: distributedKVStore.SingleKVStore | undefined;
+
+  static processCourseInfoData(courseInfoData: Object[]){
+    for(let course of courseInfoData) {
+      try {
+        let timeTableList: Array<Object> = (course as object)?.['timeTableList'];
+        for(let item of timeTableList){
+          let courseName: string = (item as object)?.['courseName']
+          let timeStart: number = (item as object)?.['timeStart']
+          let timeEnd: number = (item as object)?.['timeEnd']
+          let teacher: string = (item as object)?.['teacherName']
+          let room: string = (item as object)?.['roomIdI18n'] ?? (item as object)?.['roomLable']
+          let weeks: Array<number> = (item as object)?.['weeks']
+
+          let courseObj = new CourseInfo(
+            courseName!!,
+            timeStart!!,
+            timeEnd!!,
+            teacher!!,
+            room!!,
+            weeks!!
+          )
+          CourseInfoList.courseInfoArray.push(courseObj)
+        }
+      } catch (e){
+        console.error(`解析课程表时发生错误：${JSON.stringify(e)}\n本条解析忽略`)
+      }
+    }
+  }
+
+  static toJson(){
+    return JSON.stringify(CourseInfoList.courseInfoArray)
+  }
+
+  static async storeIntoKV(){}
 }
-export let courseInfoList: CourseInfoList = new CourseInfoList();
 
 export class MsgList{
   static msgArray: CommonMsgData[] = new Array<CommonMsgData>();
