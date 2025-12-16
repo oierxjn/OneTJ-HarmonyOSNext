@@ -1,5 +1,6 @@
 import { distributedKVStore } from "@kit.ArkData";
 import { ability, Ability, bundleManager, UIAbility, common } from "@kit.AbilityKit";
+import { CourseInfo } from "../models/UserModel";
 
 export let kvManager: distributedKVStore.KVManager | undefined = undefined;
 
@@ -200,3 +201,11 @@ export class GlobalContext{
     return GlobalContext.context;
   }
 }
+
+export class CourseInfoListDataSource extends ListDataSource<CourseInfo> {
+  push(course: CourseInfo){
+    this.dataList.push(course);
+    this.notifyDataAdd(this.dataList.length - 1);
+  }
+}
+

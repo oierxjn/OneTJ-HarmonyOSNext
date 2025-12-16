@@ -105,7 +105,7 @@ class TongjiApi {
     try {
       response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
       let schoolCalendarInfo: Object = this.responseToData(response.result as string)
-      let schoolWeek: string = (schoolCalendarInfo as object)?.['week']
+      let schoolWeek: number = (schoolCalendarInfo as object)?.['week']
       let simpleName: string = (schoolCalendarInfo as object)?.['simpleName']
       let schoolCalendar: object = (schoolCalendarInfo as object)?.['schoolCalendar']
       let calendarId: string = schoolCalendar?.['id']

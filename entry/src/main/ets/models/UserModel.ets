@@ -1,6 +1,7 @@
 import { distributedKVStore } from "@kit.ArkData";
 import { CommonMsgData, kvManager } from "../DisplayUtils/DataUtils";
 import { tongjiApi } from "./TongjiApi";
+import { JSON } from "@kit.ArkTS";
 
 const KVConfig: distributedKVStore.Options = {
   encrypt: true,
@@ -217,7 +218,7 @@ export class SchoolCalendarInfo {
   static calendarId: string | null
   static year: string | null
   static term: string | null
-  static schoolWeek: string | null
+  static schoolWeek: number | undefined
   static simpleName: string | null
   static updateTime: number = 0
   static isFetched: boolean = false
@@ -232,7 +233,7 @@ export class SchoolCalendarInfo {
 
   static KVStore: distributedKVStore.SingleKVStore | undefined;
 
-  static storeSchoolCalendarInfo(calendarId: string, year: string, term: string, schoolWeek: string, simpleName: string, updateTime?: number){
+  static storeSchoolCalendarInfo(calendarId: string, year: string, term: string, schoolWeek: number, simpleName: string, updateTime?: number){
     SchoolCalendarInfo.calendarId = calendarId
     SchoolCalendarInfo.year = year
     SchoolCalendarInfo.term = term
@@ -267,7 +268,7 @@ export class SchoolCalendarInfo {
       let calendarId = await calendarIdTask as string
       let year = await yearTask as string
       let term = await termTask as string
-      let schoolWeek = await schoolWeekTask as string
+      let schoolWeek = await schoolWeekTask as number
       let simpleName = await simpleNameTask as string
       let updateTime = await updateTimeTask as number
       SchoolCalendarInfo.storeSchoolCalendarInfo(
@@ -311,6 +312,7 @@ export class CourseInfo{
   timeEnd: number;
   teacher: string;
   room: string;
+  dayOfWeek: number;
   weeks: Array<number>;
   constructor(
     courseName: string = '',
@@ -318,6 +320,7 @@ export class CourseInfo{
     timeEnd: number = 1,
     teacher: string = '',
     room: string ='',
+    dayOfWeek: number,
     weeks: Array<number>
   ){
     this.courseName = courseName
@@ -325,6 +328,7 @@ export class CourseInfo{
     this.timeEnd = timeEnd
     this.teacher = teacher
     this.room = room
+    this.dayOfWeek = dayOfWeek
     this.weeks = weeks
   }
 }
@@ -334,12 +338,14 @@ export class CourseInfoList{
   static updateTime: number = 0;
   static isFetched: boolean = false;
 
+  static courseInfoKey: string = 'courseInfoKey';
   static courseInfoArrayKey: string = 'courseInfoArrayKey';
   static updateTimeKey: string = 'updateTimeKey';
 
   static KVStore: distributedKVStore.SingleKVStore | undefined;
 
   static processCourseInfoData(courseInfoData: Object[]){
+    let infoList = new Array<CourseInfo>();
     for(let course of courseInfoData) {
       try {
         let timeTableList: Array<Object> = (course as object)?.['timeTableList'];
@@ -349,6 +355,7 @@ export class CourseInfoList{
           let timeEnd: number = (item as object)?.['timeEnd']
           let teacher: string = (item as object)?.['teacherName']
           let room: string = (item as object)?.['roomIdI18n'] ?? (item as object)?.['roomLable']
+          let dayOfWeek: number = (item as object)?.['dayOfWeek']
           let weeks: Array<number> = (item as object)?.['weeks']
 
           let courseObj = new CourseInfo(
@@ -357,21 +364,89 @@ export class CourseInfoList{
             timeEnd!!,
             teacher!!,
             room!!,
+            dayOfWeek!!,
             weeks!!
           )
-          CourseInfoList.courseInfoArray.push(courseObj)
+          infoList.push(courseObj)
         }
       } catch (e){
         console.error(`解析课程表时发生错误：${JSON.stringify(e)}\n本条解析忽略`)
       }
     }
+    CourseInfoList.storeCourseInfoList(infoList)
   }
 
-  static toJson(){
-    return JSON.stringify(CourseInfoList.courseInfoArray)
+  static getWeekCourseInfo(week: number, courseInfoArray: CourseInfo[] = CourseInfoList.courseInfoArray): CourseInfo[]{
+    if(!CourseInfoList.isFetched)throw new Error('CourseInfoList 未初始化')
+    let infoList: CourseInfo[] = new Array<CourseInfo>();
+    for(let course of courseInfoArray){
+      if(course.weeks.includes(week))
+        infoList.push(course)
+    }
+    return infoList
   }
 
-  static async storeIntoKV(){}
+  static getDayOfWeekCourseInfo(dayOfWeek: number, courseInfoArray: CourseInfo[]): CourseInfo[]{
+    if(!CourseInfoList.isFetched)throw new Error('CourseInfoList 未初始化')
+    let infoList: CourseInfo[] = new Array<CourseInfo>();
+    for(let course of courseInfoArray){
+      if(course.dayOfWeek == dayOfWeek)
+        infoList.push(course)
+    }
+    return infoList
+  }
+
+  static storeCourseInfoList(courseInfoArray: CourseInfo[], updateTime?: number){
+    CourseInfoList.courseInfoArray = courseInfoArray
+    CourseInfoList.updateTime = updateTime ?? Date.now()
+    CourseInfoList.isFetched = true
+  }
+
+  static async storeIntoKV(){
+    try {
+      let courseInfoArrayTask = CourseInfoList.KVStore!!.put(CourseInfoList.courseInfoArrayKey, JSON.stringify(CourseInfoList.courseInfoArray))
+      let updateTimeTask = CourseInfoList.KVStore!!.put(CourseInfoList.updateTimeKey, CourseInfoList.updateTime)
+
+      await Promise.all([courseInfoArrayTask, updateTimeTask])
+    } catch (e){
+      console.error(`存储课程表时发生错误：${e}`)
+
+    }
+  }
+  static async loadFromKV(){
+    try {
+      let courseInfoArrayTask = CourseInfoList.KVStore!!.get(CourseInfoList.courseInfoArrayKey)
+      let updateTimeTask = CourseInfoList.KVStore!!.get(CourseInfoList.updateTimeKey)
+
+      let courseInfoArrayString = await courseInfoArrayTask as string
+      let updateTime = await updateTimeTask as number
+
+      let courseInfoArray = JSON.parse(courseInfoArrayString) as Array<CourseInfo>
+      CourseInfoList.storeCourseInfoList(
+        courseInfoArray!!,
+        updateTime!!
+      )
+    } catch (e){
+      console.error(`加载课程表数据库时发生错误：${e}`)
+    }
+  }
+  static async clearFromKV(){
+    try {
+      let courseInfoArrayTask = CourseInfoList.KVStore!!.delete(CourseInfoList.courseInfoArrayKey)
+      let updateTimeTask = CourseInfoList.KVStore!!.delete(CourseInfoList.updateTimeKey)
+
+      await Promise.all([courseInfoArrayTask, updateTimeTask])
+    } catch (e){
+      console.error(`清除 CourseInfo 数据库时发生错误：${e}`)
+    }
+  }
+  static async initKV() {
+    try {
+      CourseInfoList.KVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>(CourseInfoList.courseInfoKey, KVConfig)
+    } catch (e) {
+      console.error(`初始化 CourseInfo 数据库时发生错误：${e}`)
+    }
+  }
 }
 
 export class MsgList{

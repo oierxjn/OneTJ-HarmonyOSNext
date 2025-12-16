@@ -1,30 +1,41 @@
+import { CourseInfo } from "../models/UserModel"
 import { PageName } from "../pages/Login"
+import { LengthMetrics } from "@kit.ArkUI"
 
 
 @Component
 export struct CourseInfoCard {
-  @State info: string = "Info"
+  @Require course: CourseInfo
+
   build() {
     Row() {
-      Column() {
-        Text(this.info)
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-          .backgroundColor('#25303345')
-        Button()
-          .onClick(() => {
-            this.info = "Click"
-          })
-      }
-      .alignItems(HorizontalAlign.Center)
-      .width('70%')
       Image($rawfile('fluentemoji/banana_color.svg'))
-        .width('30%')
+        .width('20%')
+      Divider()
+        .vertical(true)
+        .margin({left: 5, right: 5})
+        .visibility(Visibility.Hidden)
+      Column() {
+        Text(this.course.courseName)
+          .fontSize(24)
+        Text(`地点：${this.course.room}`)
+          .fontSize(20)
+        Text(`教师：${this.course.teacher}`)
+          .fontSize(20)
+      }
+        .alignItems(HorizontalAlign.Start)
+        .width('60%')
+      Text(`${this.course.timeStart}-${this.course.timeEnd}`)
+        .fontSize(26)
+        .alignSelf(ItemAlign.End)
+        .margin({bottom: 10})
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#35253033')
-    .borderRadius('5%')
+    .border({
+      width: 1,
+      radius: '5%'
+    })
   }
 }
 

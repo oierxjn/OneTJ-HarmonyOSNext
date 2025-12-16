@@ -91,7 +91,7 @@ export struct DetailMsg {
           Button(`刷新`)
             .onClick(() => {
               this.controller.refresh()
-              console.debug(`调试：网页开始刷新`)
+              console.debug(`网页开始刷新`)
             })
             .border({
               radius: 5,
