@@ -10,18 +10,20 @@ export struct StudentTimeTable {
   @Consume('navPathStack') navPathStack: NavPathStack;
 
   @State courseInfoList: CourseInfoListDataSource = new CourseInfoListDataSource()
+  @State currentIndex: number = 0;
 
+  private tabPageController: TabsController = new TabsController();
 
   async aboutToAppear(){
-    console.debug('调试：StudentTimeTable页面即将出现')
     let isFromInternet: boolean = false;
     if(!CourseInfoList.isFetched){
       await CourseInfoList.initKV()
       await CourseInfoList.loadFromKV()
       if(!CourseInfoList.isFetched){
-        if(await tongjiApi.getCourseInfoList())
+        if(await tongjiApi.getCourseInfoList()){
           console.debug(`调试：从网络加载课程表完成`)
           isFromInternet = true
+        }
       }
     }
     let weekCourse = CourseInfoList.getWeekCourseInfo(SchoolCalendarInfo.schoolWeek!!)
@@ -36,6 +38,50 @@ export struct StudentTimeTable {
 
   build() {
     NavDestination(){
+      Column() {
+        Tabs({ 
+          controller: this.tabPageController,
+          barPosition: BarPosition.Start,
+          index: this.currentIndex
+        }) {
+          TabContent() {
+            SingleDayTimeTable({courseInfoList: this.courseInfoList})
+              .layoutWeight(1)
+          }
+          .tabBar('每日')
+          
+          TabContent() {
+            // 每周视图，暂时留空
+            Column() {
+              Text('每周课表')
+                .fontSize(24)
+              Text('功能开发中...')
+            }
+            .layoutWeight(1)
+            .justifyContent(FlexAlign.Center)
+          }
+          .tabBar('每周')
+          
+          TabContent() {
+            // 每年视图，暂时留空
+            Column() {
+              Text('每年课表')
+                .fontSize(24)
+              Text('功能开发中...')
+            }
+            .layoutWeight(1)
+            .justifyContent(FlexAlign.Center)
+          }
+          .tabBar('每年')
+        }
+        .layoutWeight(1)
+        .barMode(BarMode.Fixed)
+        .onChange((index: number) => {
+          this.currentIndex = index;
+        })
+      }
+      .width('100%')
+      .height('100%')
     }
     .onBackPressed( () => {
       this.navPathStack.pop()
