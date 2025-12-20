@@ -25,10 +25,6 @@ export struct CourseInfoCard {
       }
         .alignItems(HorizontalAlign.Start)
         .width('60%')
-      Text(`${this.course.timeStart}-${this.course.timeEnd}`)
-        .fontSize(26)
-        .alignSelf(ItemAlign.End)
-        .margin({bottom: 10})
     }
     .width('100%')
     .height('100%')

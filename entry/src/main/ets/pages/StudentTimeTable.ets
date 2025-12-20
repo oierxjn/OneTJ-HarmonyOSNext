@@ -32,8 +32,9 @@ export struct StudentTimeTable {
     for(let course of todayCourse){
       this.courseInfoList.push(course)
     }
-    if(isFromInternet)
+    if(isFromInternet){
       await CourseInfoList.storeIntoKV()
+    }
   }
 
   build() {
@@ -41,7 +42,7 @@ export struct StudentTimeTable {
       Column() {
         Tabs({ 
           controller: this.tabPageController,
-          barPosition: BarPosition.Start,
+          barPosition: BarPosition.End,
           index: this.currentIndex
         }) {
           TabContent() {
@@ -49,7 +50,7 @@ export struct StudentTimeTable {
               .layoutWeight(1)
           }
           .tabBar('每日')
-          
+          /*
           TabContent() {
             // 每周视图，暂时留空
             Column() {
@@ -73,6 +74,7 @@ export struct StudentTimeTable {
             .justifyContent(FlexAlign.Center)
           }
           .tabBar('每年')
+          */
         }
         .layoutWeight(1)
         .barMode(BarMode.Fixed)
