@@ -2,14 +2,45 @@ import { CourseInfo } from "../models/UserModel"
 import { PageName } from "../pages/Login"
 import { LengthMetrics } from "@kit.ArkUI"
 
+@Component
+export struct CommonInfoCard {
+  @Require title: string
+  description: string = ''
+
+  async aboutToAppear() {
+    console.debug(`调试：${this.title}出现`)
+  }
+
+  build() {
+    Row() {
+      Column() {
+        Text(this.title)
+          .fontSize(24)
+        Text(this.description)
+          .fontSize(20)
+      }
+      .alignItems(HorizontalAlign.Start)
+      .width('60%')
+    }
+    .width('100%')
+    .height('100%')
+    .border({
+      width: 1,
+      radius: '5%'
+    })
+  }
+}
+
+
 
 @Component
 export struct CourseInfoCard {
   @Require course: CourseInfo
+  avatar: ResourceStr = $rawfile('fluentemoji/banana_color.svg')
 
   build() {
     Row() {
-      Image($rawfile('fluentemoji/banana_color.svg'))
+      Image(this.avatar)
         .width('20%')
       Divider()
         .vertical(true)

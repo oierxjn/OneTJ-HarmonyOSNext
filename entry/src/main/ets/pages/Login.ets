@@ -7,12 +7,14 @@ import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
 import image from '@ohos.multimedia.image';
 import { StudentTimeTable } from './StudentTimeTable';
+import { PhysicalExperiment } from './PhysicalExperiment';
 
 export enum PageName{
   HomePage = 'Page_Home',
   LoginOAuthWebView = 'Page_LoginOAuth_WebView',
   DetailMsgPage = 'Page_Detail_Msg',
   StudentTimeTablePage = 'Page_Student_Time_Table',
+  PhysicalExperimentPage = 'Page_Physical_Experiment',
 }
 // TODO 不进行令牌刷新
 const REFRESH_TOKEN: boolean = false
@@ -52,6 +54,8 @@ struct Login {
       DetailMsg()
     }else if(name == PageName.StudentTimeTablePage){
       StudentTimeTable()
+    }else if(name == PageName.PhysicalExperimentPage){
+      PhysicalExperiment()
     }
   }
 

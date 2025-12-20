@@ -31,8 +31,8 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {
     throw new Error("Function not implemented.")
   },
-  [HomeFunctions.EXP_CALC]: (): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.EXP_CALC]: (navPathStack: NavPathStack): void => {
+    navPathStack.pushPath({name: PageName.PhysicalExperimentPage})
   }
 }
 
