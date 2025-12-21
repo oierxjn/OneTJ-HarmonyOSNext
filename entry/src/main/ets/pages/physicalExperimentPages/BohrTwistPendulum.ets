@@ -1,4 +1,15 @@
 import { Markdown } from "@luvi/lv-markdown-in"
+import { InputSingleLine } from "../../DisplayUtils/InputUtils"
+import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
+
+@Extend(Text)
+function textStyle(){
+  .fontSize(26)
+  .textAlign(TextAlign.Start)
+  .width('100%')
+}
+
+
 @Component
 export struct BohrTwistPendulum{
   @State freeVibrationPeriod: string = (1.5700).toString()
@@ -6,22 +17,25 @@ export struct BohrTwistPendulum{
 
   build() {
     NavDestination(){
-      Column(){
+      Column() {
         Text(`自由振动`)
-          .fontSize(26)
-        TextInput({
+          .textStyle()
+        InputSingleLine({
+          label: `周期`,
           placeholder: this.freeVibrationPeriod,
-          text: $$this.freeVibrationPeriod
-        })
-        TextArea({
-          placeholder: ``,
-          text: this.freeVibrationPeriodList
+          text: $freeVibrationPeriodList,
+          vertical: false
         })
         ColumnSplit()
         Text(`阻尼振动`)
+          .textStyle()
         ColumnSplit()
-
+        Button(`调试按钮`)
+          .onClick(() => {
+            console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
+          })
       }
+        .width('90%').height('100%')
     }
   }
 }
