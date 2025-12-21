@@ -8,6 +8,7 @@ import { LoginOAuthWebView } from './LoginOAuthWebView';
 import image from '@ohos.multimedia.image';
 import { StudentTimeTable } from './StudentTimeTable';
 import { PhysicalExperiment } from './PhysicalExperiment';
+import { BohrTwistPendulum } from './physicalExperimentPages/BohrTwistPendulum';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -16,14 +17,14 @@ export enum PageName{
   StudentTimeTablePage = 'Page_Student_Time_Table',
   PhysicalExperimentPage = 'Page_Physical_Experiment',
 }
+
+export enum PhysicalExperimentSub{
+  BohrTwistPendulumPage = 'Page_Physical_Experiment_Bohr_Twist_Pendulum',
+}
 // TODO 不进行令牌刷新
-const REFRESH_TOKEN: boolean = false
+const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
-// @Styles
-// function backgroundAnimation{
-//
-// }
 
 
 
@@ -56,6 +57,8 @@ struct Login {
       StudentTimeTable()
     }else if(name == PageName.PhysicalExperimentPage){
       PhysicalExperiment()
+    }else if(name == PhysicalExperimentSub.BohrTwistPendulumPage){
+      BohrTwistPendulum()
     }
   }
 

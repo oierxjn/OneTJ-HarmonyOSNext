@@ -1,10 +1,10 @@
 import { CommonInfoCard } from '../components/InfoCard'
-import { PageName } from './Login'
+import { PageName, PhysicalExperimentSub } from './Login'
 
 class physicalExperimentInfo{
   title: string = ""
   description: string = ""
-  onClick?: Function = () => {}
+  onClick: ()=>void = () => {}
 }
 
 @Component
@@ -14,8 +14,9 @@ export struct PhysicalExperiment {
 
   physicalExperimentList: physicalExperimentInfo[] = [
     { title: "波尔扭摆实验", description: "", onClick: ()=>{
-      // TODO
-      // this.navPathStack.pushPath({})
+      this.navPathStack.pushPath({
+        name: PhysicalExperimentSub.BohrTwistPendulumPage,
+      })
   }},
     // { title: "Experiment 2", description: "This is the second experiment"}
   ]
@@ -29,6 +30,9 @@ export struct PhysicalExperiment {
             title: item.title,
             description: item.description,
           })
+            .onClick(()=>{
+              item.onClick()
+            })
             .width('100%').height(120)
         })
       }
