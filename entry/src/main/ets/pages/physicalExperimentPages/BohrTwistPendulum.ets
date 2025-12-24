@@ -1,5 +1,5 @@
 import { Markdown } from "@luvi/lv-markdown-in"
-import { InputSingleLine } from "../../DisplayUtils/InputUtils"
+import { InputMultiLine, InputSingleLine } from "../../DisplayUtils/InputUtils"
 import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
 
 @Extend(Text)
@@ -23,9 +23,14 @@ export struct BohrTwistPendulum{
         InputSingleLine({
           label: `周期`,
           placeholder: this.freeVibrationPeriod,
-          text: $freeVibrationPeriodList,
+          text: $freeVibrationPeriod,
           vertical: false
         })
+        InputMultiLine({
+          label: `周期表格`,
+          text: $freeVibrationPeriodList
+        })
+          .width('100%').height('20%')
         ColumnSplit()
         Text(`阻尼振动`)
           .textStyle()

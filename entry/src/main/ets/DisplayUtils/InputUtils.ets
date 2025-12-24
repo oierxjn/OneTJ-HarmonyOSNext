@@ -20,13 +20,14 @@ export struct InputSingleLine{
         })
       }
     }else{
-      Row(){
+      Flex({direction: FlexDirection.Row}){
         Text(this.label)
           .fontSize(this.labelFontSize)
         TextInput({
           text: this.text,
           placeholder: this.placeholder,
         })
+          .backgroundColor('#30114514')
       }
     }
   }
@@ -50,6 +51,7 @@ export struct InputMultiLine{
           text: $$this.text,
           placeholder: this.placeholder,
         })
+          .height('80%')
       }
     }else {
       Row(){
@@ -59,6 +61,7 @@ export struct InputMultiLine{
           text: $$this.text,
           placeholder: this.placeholder,
         })
+          .height('100%')
       }
     }
   }
