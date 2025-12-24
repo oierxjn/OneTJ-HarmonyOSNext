@@ -39,7 +39,8 @@ export struct BohrTwistPendulum{
         Button(`调试按钮`)
           .onClick(() => {
             // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
-            bohrTwistPendulum.test(this.freeVibrationPeriodList)
+            let time = bohrTwistPendulum.testProcessTime(this.freeVibrationPeriodList)
+            console.debug(`调试：${time}`)
           })
       }
         .width('90%').height('100%')
