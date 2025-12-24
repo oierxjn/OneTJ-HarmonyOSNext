@@ -1,6 +1,7 @@
 import { Markdown } from "@luvi/lv-markdown-in"
 import { InputMultiLine, InputSingleLine } from "../../DisplayUtils/InputUtils"
 import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
+import { bohrTwistPendulum } from "../../models/physicalExperiment/BohrTwistPendulum"
 
 @Extend(Text)
 function textStyle(){
@@ -37,7 +38,8 @@ export struct BohrTwistPendulum{
         ColumnSplit()
         Button(`调试按钮`)
           .onClick(() => {
-            console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
+            // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
+            bohrTwistPendulum.test(this.freeVibrationPeriodList)
           })
       }
         .width('90%').height('100%')

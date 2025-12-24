@@ -1,4 +1,4 @@
-import { ComposeListItem } from '@kit.ArkUI'
+import { ComposeListItem, LengthUnit } from '@kit.ArkUI'
 
 @Component
 export struct InputSingleLine{
@@ -14,21 +14,28 @@ export struct InputSingleLine{
           .fontSize(this.labelFontSize)
           .align(Alignment.Start)
           .width('100%')
+          .maxLines(1)
         TextInput({
           text: $$this.text,
           placeholder: this.placeholder,
         })
       }
     }else{
-      Flex({direction: FlexDirection.Row}){
+      Row(){
         Text(this.label)
           .fontSize(this.labelFontSize)
+          .align(Alignment.Center)
+          .width('30%')
         TextInput({
           text: this.text,
           placeholder: this.placeholder,
         })
+          .width('70%')
           .backgroundColor('#30114514')
       }
+        .backgroundColor('#30984514')
+        .width('100%')
+        .alignItems(VerticalAlign.Center)
     }
   }
 }
