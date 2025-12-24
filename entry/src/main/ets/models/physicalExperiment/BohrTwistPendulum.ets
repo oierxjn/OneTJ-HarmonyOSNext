@@ -1,11 +1,15 @@
 import { GetData } from './DataProcess'
 
 class BohrTwistPendulum {
-  testProcessTime(data: string): number{
+  /**
+   * 从表格数据中得到周期
+   *
+   * @param data
+   * @returns
+   */
+  processTimeFromTable(data: string): number{
     let processedData = data.split(/\s/)
-    let cnt = 0
     let columnNumber = 3
-    let T = 0
     let resultData: string[][] = []
     let tempRow: string[] = []
 
@@ -16,7 +20,7 @@ class BohrTwistPendulum {
       tempRow.push(item)
       if(tempRow.length % columnNumber == 0) {
         resultData.push(tempRow)
-        cnt++
+        tempRow = []
       }
     }
     let dataUnit = new GetData(resultData)
@@ -28,7 +32,6 @@ class BohrTwistPendulum {
       sum += parseFloat(dataUnit.data[i][2])
     }
     let averageTime = sum / dataUnit.data.length
-    console.debug(`调试：计算sum:${sum}\n长度${dataUnit.data.length}\n最终值为${averageTime}`)
     return averageTime
   }
 }

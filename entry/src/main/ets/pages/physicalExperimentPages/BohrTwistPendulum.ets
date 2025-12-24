@@ -1,5 +1,5 @@
 import { Markdown } from "@luvi/lv-markdown-in"
-import { InputMultiLine, InputSingleLine } from "../../DisplayUtils/InputUtils"
+import { PhysicalExperimentInputMultiLine, PhysicalExperimentInputSingleLine } from "../../DisplayUtils/InputUtils"
 import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
 import { bohrTwistPendulum } from "../../models/physicalExperiment/BohrTwistPendulum"
 
@@ -21,13 +21,13 @@ export struct BohrTwistPendulum{
       Column() {
         Text(`自由振动`)
           .textStyle()
-        InputSingleLine({
+        PhysicalExperimentInputSingleLine({
           label: `周期`,
           placeholder: this.freeVibrationPeriod,
           text: $freeVibrationPeriod,
           vertical: false
         })
-        InputMultiLine({
+        PhysicalExperimentInputMultiLine({
           label: `周期表格`,
           text: $freeVibrationPeriodList
         })
@@ -39,7 +39,8 @@ export struct BohrTwistPendulum{
         Button(`调试按钮`)
           .onClick(() => {
             // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
-            let time = bohrTwistPendulum.testProcessTime(this.freeVibrationPeriodList)
+            let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodList)
+            this.freeVibrationPeriod = time.toString()
             console.debug(`调试：${time}`)
           })
       }
