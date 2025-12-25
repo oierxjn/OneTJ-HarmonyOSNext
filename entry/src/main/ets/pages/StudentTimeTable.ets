@@ -3,6 +3,7 @@ import { CourseInfoListDataSource } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
 import { CourseInfo, CourseInfoList, SchoolCalendarInfo } from '../models/UserModel';
 import { JSON } from '@kit.ArkTS';
+import { getRandomSingleElementFromArray } from '../components/Funcs';
 
 @Component
 export struct StudentTimeTable {
@@ -89,8 +90,20 @@ export struct StudentTimeTable {
       this.navPathStack.pop()
       return true
     })
+    // TODO 目前先做成今日课程
+    .title('今日课程')
   }
 }
+
+let CourseAvatar: Resource[] = [
+  $rawfile('fluentemoji-png/pear_3d.png'),
+  $rawfile('fluentemoji-png/hamburger_3d.png'),
+  $rawfile('fluentemoji-png/tropical_drink_3d.png'),
+  $rawfile('fluentemoji-png/watermelon_3d.png'),
+  $rawfile('fluentemoji-png/bread_3d.png')
+]
+
+
 
 @Component
 struct SingleDayTimeTable{
@@ -102,7 +115,7 @@ struct SingleDayTimeTable{
       LazyForEach(this.courseInfoList, (item: CourseInfo) => {
         ListItem(){
           Column(){
-            CourseInfoCard({course: item})
+            CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
               .width('95%').height('120')
             Divider()
               .margin({top: 5, bottom: 5})

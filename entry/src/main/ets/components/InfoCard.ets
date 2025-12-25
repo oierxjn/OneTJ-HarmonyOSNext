@@ -27,7 +27,8 @@ export struct CommonInfoCard {
     .padding('10%')
     .border({
       width: 1,
-      radius: '5%'
+      radius: '5%',
+      color: $r('sys.color.ohos_id_color_foreground')
     })
   }
 }
@@ -61,7 +62,8 @@ export struct CourseInfoCard {
     .height('100%')
     .border({
       width: 1,
-      radius: '5%'
+      radius: '5%',
+      color: $r('sys.color.ohos_id_color_foreground')
     })
   }
 }

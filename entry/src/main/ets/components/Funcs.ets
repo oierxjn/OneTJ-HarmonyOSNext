@@ -8,6 +8,17 @@ export function asyncSleep(ms: number): Promise<void>{
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function getRandomSingleElementFromArray<T>(arr: T[]): T | undefined {
+  // 边界处理：空数组直接返回undefined
+  if (arr.length === 0) {
+    console.warn("源数组不能为空！");
+    return undefined;
+  }
+  // 生成随机合法索引
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  // 返回对应索引的元素
+  return arr[randomIndex];
+}
 
 
 export class Downloader{

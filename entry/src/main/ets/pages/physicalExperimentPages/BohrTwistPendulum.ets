@@ -2,7 +2,8 @@ import { Markdown } from "@luvi/lv-markdown-in"
 import { PhysicalExperimentInputMultiLine, PhysicalExperimentInputSingleLine } from "../../DisplayUtils/InputUtils"
 import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
 import { bohrTwistPendulum } from "../../models/physicalExperiment/BohrTwistPendulum"
-import { PromptAction } from "@kit.ArkUI"
+import { PromptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { HelpSub } from "../Login"
 
 @Extend(Text)
 function titleTextStyle(){
@@ -18,6 +19,15 @@ function normalTextStyle(){
   .width('100%')
 }
 
+@Extend(Column)
+function cardStyle(backgroundColor: ResourceColor){
+  .border({
+    width: 10,
+    radius: 5,
+    color: '#00000000'
+  })
+  .backgroundColor(backgroundColor)
+}
 
 @Component
 export struct BohrTwistPendulum{
@@ -29,6 +39,8 @@ export struct BohrTwistPendulum{
 
   @State logAnswer: string = ``
   @State graphAnswer: string = ``
+
+  @Consume('navPathStack') navPathStack: NavPathStack
 
   promptAction: PromptAction = this.getUIContext().getPromptAction()
 
@@ -53,6 +65,7 @@ export struct BohrTwistPendulum{
               .width('100%').height('20%')
           }.padding({left: 5, right: 5})
         }
+          .cardStyle('#60DCE5D6')
         Column({space: 5}){
           Text(`阻尼振动`)
             .titleTextStyle()
@@ -66,9 +79,9 @@ export struct BohrTwistPendulum{
           }
             .padding({left: 5, right: 5})
         }
+          .cardStyle('#30E45D25')
         Button(this.buttonText)
           .onClick(() => {
-            // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
             let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodListData)
             console.debug(`调试：周期${time}`)
             if(time != 0){
@@ -85,19 +98,29 @@ export struct BohrTwistPendulum{
             this.logAnswer = bohrTwistPendulum.logSlopeK.toString()
             this.graphAnswer = bohrTwistPendulum.graphSlopeK.toString()
           })
-        Column({space: 5}){
+          .width('100%')
+        Column({space: 5}) {
           Text(`计算结果`)
             .titleTextStyle()
-          Column({space: 5}){
+          Column({ space: 5 }) {
             Text(`对数逐差法：${this.logAnswer}`)
               .normalTextStyle()
             Text(`作图法：${this.graphAnswer}`)
               .normalTextStyle()
           }
         }
+          .cardStyle('#305556A4')
       }
         .width('90%').height('100%')
-
     }
+      .menus([
+        {
+          value: `帮助`,
+          action: ()=>{
+            this.navPathStack.pushPath({name: HelpSub.ExperimentHelpPage})
+          },
+          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.questionmark_circle'))
+        }
+      ])
   }
 }

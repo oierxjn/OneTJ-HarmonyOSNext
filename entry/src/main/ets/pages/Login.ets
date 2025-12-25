@@ -9,6 +9,7 @@ import image from '@ohos.multimedia.image';
 import { StudentTimeTable } from './StudentTimeTable';
 import { PhysicalExperiment } from './PhysicalExperiment';
 import { BohrTwistPendulum } from './physicalExperimentPages/BohrTwistPendulum';
+import { ExperimentHelp } from './helpPages/ExperimentHelp';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -20,6 +21,10 @@ export enum PageName{
 
 export enum PhysicalExperimentSub{
   BohrTwistPendulumPage = 'Page_Physical_Experiment_Bohr_Twist_Pendulum',
+}
+
+export enum HelpSub{
+  ExperimentHelpPage = 'Page_Help_Experiment_Help',
 }
 
 const REFRESH_TOKEN: boolean = true
@@ -59,6 +64,8 @@ struct Login {
       PhysicalExperiment()
     }else if(name == PhysicalExperimentSub.BohrTwistPendulumPage){
       BohrTwistPendulum()
+    }else if(name == HelpSub.ExperimentHelpPage){
+      ExperimentHelp()
     }
   }
 
