@@ -10,6 +10,8 @@ import { StudentTimeTable } from './StudentTimeTable';
 import { PhysicalExperiment } from './PhysicalExperiment';
 import { BohrTwistPendulum } from './physicalExperimentPages/BohrTwistPendulum';
 import { ExperimentHelp } from './helpPages/ExperimentHelp';
+import bundleManager from '@ohos.bundle.bundleManager'
+import { About } from './About';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -17,6 +19,7 @@ export enum PageName{
   DetailMsgPage = 'Page_Detail_Msg',
   StudentTimeTablePage = 'Page_Student_Time_Table',
   PhysicalExperimentPage = 'Page_Physical_Experiment',
+  AboutPage = 'Page_About',
 }
 
 export enum PhysicalExperimentSub{
@@ -26,6 +29,8 @@ export enum PhysicalExperimentSub{
 export enum HelpSub{
   ExperimentHelpPage = 'Page_Help_Experiment_Help',
 }
+
+export let bundleInfo: undefined | bundleManager.BundleInfo
 
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
@@ -60,8 +65,10 @@ struct Login {
       DetailMsg()
     }else if(name == PageName.StudentTimeTablePage){
       StudentTimeTable()
-    }else if(name == PageName.PhysicalExperimentPage){
+    }else if(name == PageName.PhysicalExperimentPage) {
       PhysicalExperiment()
+    }else if(name == PageName.AboutPage){
+      About()
     }else if(name == PhysicalExperimentSub.BohrTwistPendulumPage){
       BohrTwistPendulum()
     }else if(name == HelpSub.ExperimentHelpPage){
@@ -75,6 +82,7 @@ struct Login {
     this.allowLogin = false
 
     let wallpaperTask = this.setWallPaper()
+    let bundleInfoTask = this.getBundleInfo()
     if(!await initKVManager(this.getUIContext().getHostContext()!!)){
       console.error('KVManager初始化失败')
       return
@@ -87,7 +95,12 @@ struct Login {
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
     }
-    await wallpaperTask
+    Promise.all([wallpaperTask, bundleInfoTask])
+  }
+
+  async getBundleInfo(){
+    bundleInfo = await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT)
+    console.debug(`调试：bundleInfo:${JSON.stringify(bundleInfo)}`)
   }
 
   async autoLogin(refreshFlag: boolean = REFRESH_TOKEN): Promise<boolean>{

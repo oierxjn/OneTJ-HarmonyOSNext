@@ -21,8 +21,20 @@
       "value": "加入讨论群"
     },
     {
+      "name": "Build_time",
+      "value": "2025.12.25-20:41"
+    },
+    {
+      "name": "Version_name",
+      "value": "1.0.0"
+    },
+    {
       "name": "Permission_Internet_require_reason",
       "value": "用于验证用户登录，请求云端用户数据"
+    },
+    {
+      "name": "Permission_Bundle_info_require",
+      "value": "用于读取本应用的版本包信息"
     }
-  ]
-}
+
+  ]}

@@ -16,8 +16,8 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.SETTINGS]: (): void => {
     throw new Error("Function not implemented.")
   },
-  [HomeFunctions.ABOUT]: (): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.ABOUT]: (navPathStack: NavPathStack): void => {
+    navPathStack.pushPath({name: PageName.AboutPage})
   },
   [HomeFunctions.LOGOUT]: (navPathStack): void => {
     setTimeout(async () =>{
