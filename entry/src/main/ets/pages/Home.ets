@@ -69,19 +69,22 @@ export struct Home {
     await StudentInfo.storeIntoKV()
   }
   async createTermInfoTask(): Promise<void> {
-    await SchoolCalendarInfo.initKV()
-    await SchoolCalendarInfo.loadFromKV()
-    if(!SchoolCalendarInfo.isFetched){
-      if(!await tongjiApi.getSchoolCalendarInfo()){
-        console.error('获取学期信息失败')
-        return
+    let update = ()=>{
+      try {
+        this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
+      } catch (e){
+        console.error(`出现异常：${JSON.stringify(e)}`)
       }
     }
-    try {
-      this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
-    } catch (e){
-      console.error(`出现异常：${e}`)
+
+    await SchoolCalendarInfo.initKV()
+    await SchoolCalendarInfo.loadFromKV()
+    update()
+    if(!await tongjiApi.getSchoolCalendarInfo()){
+      console.error('获取学期信息失败')
+      return
     }
+    update()
     await SchoolCalendarInfo.storeIntoKV()
   }
 

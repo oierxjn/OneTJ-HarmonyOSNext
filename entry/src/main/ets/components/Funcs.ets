@@ -3,9 +3,27 @@ import { fileIo } from "@kit.CoreFileKit";
 import { XJNUrlConstants } from "../constants/WebUrlConstants";
 import image from "@ohos.multimedia.image";
 import { ImageAnimatorModifier } from "@kit.ArkUI";
+import util from "@ohos.util";
 
 export function asyncSleep(ms: number): Promise<void>{
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function arrayBufferToString(buffer: ArrayBuffer, encoding: string = 'utf-8'): string {
+  // 步骤1：判断ArrayBuffer是否有效
+  if (!buffer || buffer.byteLength === 0) {
+    console.warn("ArrayBuffer为空，转换结果为空字符串");
+    return "";
+  }
+
+  // 步骤2：将ArrayBuffer转为Uint8Array（二进制字节数组，TextDecoder仅支持TypedArray输入）
+  const uint8Array = new Uint8Array(buffer);
+
+  // 步骤3：创建TextDecoder实例，指定编码格式，解码为字符串
+  const textDecoder = new util.TextDecoder();
+  const resultStr = textDecoder.decodeToString(uint8Array);
+
+  return resultStr;
 }
 
 export function getRandomSingleElementFromArray<T>(arr: T[]): T | undefined {

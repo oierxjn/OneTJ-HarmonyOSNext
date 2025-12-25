@@ -96,7 +96,8 @@ export class TokenData{
       let updateTimeTask = TokenData.KVStore!!.delete(TokenData.updateTimeKey)
       await Promise.all([accessTokenTask, expireTimeSecTask, refreshTokenTask, refreshTokenExpireSecTask, updateTimeTask])
     } catch (e){
-      console.error(e)
+      console.error(`清除Token数据库时发生错误：${JSON.stringify(e)}`)
+      throw e as Error
     }
   }
   static async initKV(){
@@ -202,7 +203,8 @@ export class StudentInfo{
 
       await Promise.all([studentIdTask, studentNameTask, deptNameTask, secondDeptNameTask, currentGradeTask, genderTask, updateTimeTask])
     } catch (e){
-      console.error(e)
+      console.error(`清楚 StudentInfo 缓存失败：${JSON.stringify(e)}`)
+      throw e as Error
     }
   }
   static async initKV(){
@@ -294,7 +296,8 @@ export class SchoolCalendarInfo {
 
       await Promise.all([calendarIdTask, yearTask, termTask, schoolWeekTask, simpleNameTask, updateTimeTask])
     } catch (e){
-      console.error(`清除 SchollCalendar 数据库时发生错误：${e}`)
+      console.error(`清除 SchollCalendar 数据库时发生错误：${JSON.stringify(e)}`)
+      throw e as Error
     }
   }
   static async initKV(){
@@ -437,7 +440,8 @@ export class CourseInfoList{
 
       await Promise.all([courseInfoArrayTask, updateTimeTask])
     } catch (e){
-      console.error(`清除 CourseInfo 数据库时发生错误：${e}`)
+      console.error(`清除 CourseInfo 数据库时发生错误：${JSON.stringify(e)}`)
+      throw e as Error
     }
   }
   static async initKV() {

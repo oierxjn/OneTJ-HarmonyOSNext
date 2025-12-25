@@ -12,6 +12,8 @@ import { BohrTwistPendulum } from './physicalExperimentPages/BohrTwistPendulum';
 import { ExperimentHelp } from './helpPages/ExperimentHelp';
 import bundleManager from '@ohos.bundle.bundleManager'
 import { About } from './About';
+import { JoinGroup } from './JoinGroup';
+import { Settings } from './Settings';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -20,6 +22,8 @@ export enum PageName{
   StudentTimeTablePage = 'Page_Student_Time_Table',
   PhysicalExperimentPage = 'Page_Physical_Experiment',
   AboutPage = 'Page_About',
+  JoinGroupPage = 'Page_Join_Group',
+  SettingsPage = 'Page_Settings',
 }
 
 export enum PhysicalExperimentSub{
@@ -67,8 +71,12 @@ struct Login {
       StudentTimeTable()
     }else if(name == PageName.PhysicalExperimentPage) {
       PhysicalExperiment()
+    }else if(name == PageName.JoinGroupPage){
+      JoinGroup()
     }else if(name == PageName.AboutPage){
       About()
+    }else if(name == PageName.SettingsPage){
+      Settings()
     }else if(name == PhysicalExperimentSub.BohrTwistPendulumPage){
       BohrTwistPendulum()
     }else if(name == HelpSub.ExperimentHelpPage){
@@ -183,6 +191,9 @@ struct Login {
                 })
                 .backgroundColor($r('app.color.start_window_button_background'))
                 .margin({bottom: "10%",top: "5%"})
+                .onClick(()=>{
+                  this.navPathStack.pushPath({name: PageName.JoinGroupPage})
+                })
             }
             .borderRadius('10%')
             .backgroundBlurStyle(BlurStyle.Thin)

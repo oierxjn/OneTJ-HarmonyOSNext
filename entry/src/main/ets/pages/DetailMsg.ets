@@ -30,7 +30,7 @@ async function downloadHTML(htmlStr: string, uiContext: UIContext){
       let writeLength = await fileIo.write(tempFile.fd, htmlStr)
       console.debug(`写入完成，写入长度：${writeLength}`)
     } catch (e){
-      console.error(`下载时出现异常：${e}`)
+      console.error(`下载时出现异常：${JSON.stringify(e)}`)
     } finally {
       if(tempFile){
         await fileIo.close(tempFile)

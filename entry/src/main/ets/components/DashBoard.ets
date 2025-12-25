@@ -13,23 +13,27 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.NONE]: (): void => {
     return
   },
-  [HomeFunctions.SETTINGS]: (): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.SETTINGS]: (navPathStack): void => {
+    navPathStack.pushPath({name: PageName.SettingsPage})
   },
   [HomeFunctions.ABOUT]: (navPathStack: NavPathStack): void => {
     navPathStack.pushPath({name: PageName.AboutPage})
   },
-  [HomeFunctions.LOGOUT]: (navPathStack): void => {
+  [HomeFunctions.LOGOUT]: (navPathStack, context): void => {
     setTimeout(async () =>{
       tongjiApi.switchRequire = true
-      let clearLoginDataTask = tongjiApi.clearLoginData()
-      let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
-      navPathStack.pop()
-      await Promise.all([clearLoginDataTask, clearLoginCookie])
+      try {
+        let clearLoginDataTask = tongjiApi.clearLoginData()
+        let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
+        navPathStack.pop()
+        await Promise.all([clearLoginDataTask, clearLoginCookie])
+      } catch (e){
+        context?.getPromptAction().showToast({ message: '清理本地数据失败' })
+      }
     })
   },
-  [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.JOIN_QQ_GROUP]: (navPathStack: NavPathStack, context): void => {
+    navPathStack.pushPath({name: PageName.JoinGroupPage})
   },
   [HomeFunctions.EXP_CALC]: (navPathStack: NavPathStack): void => {
     navPathStack.pushPath({name: PageName.PhysicalExperimentPage})
