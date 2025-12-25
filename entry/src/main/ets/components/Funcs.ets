@@ -16,12 +16,15 @@ export class Downloader{
 
   finalArrayBuffer: ArrayBuffer = new ArrayBuffer(0);
 
+  /**
+   * 构造基础流式请求 异常将向上层传播
+   *
+   * @param url
+   * @returns
+   */
   async request(url: string): Promise<number>{
     try {
       return await this.httpRequest.requestInStream(url, this.httpRequestOptions)
-    } catch (e){
-      console.error(e)
-      return (e as BusinessError).code
     } finally {
       this.httpRequest.destroy()
     }
@@ -99,7 +102,7 @@ export async function fetchNewWallpaper(context: UIContext): Promise<boolean>{
     wallpaperPixelMap = pixelMap
     return true
   } catch (e){
-    console.error(`调试：获取壁纸时发生错误：${(e as BusinessError).message}\n${(e as BusinessError).stack}`)
+    console.error(`ONETJ:Funcs 获取壁纸时发生错误：${(e as BusinessError).message}\n${(e as BusinessError).stack}`)
     return false
   } finally {
     downloader.destroy()

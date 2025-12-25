@@ -14,34 +14,52 @@ function textStyle(){
 @Component
 export struct BohrTwistPendulum{
   @State freeVibrationPeriod: string = (1.5700).toString()
-  @State freeVibrationPeriodList: string = ``
+  @State freeVibrationPeriodListData: string = ``
+  @State dampedVibrationPeriodListData: string = ``
 
   build() {
     NavDestination(){
       Column() {
-        Text(`自由振动`)
-          .textStyle()
-        PhysicalExperimentInputSingleLine({
-          label: `周期`,
-          placeholder: this.freeVibrationPeriod,
-          text: $freeVibrationPeriod,
-          vertical: false
-        })
-        PhysicalExperimentInputMultiLine({
-          label: `周期表格`,
-          text: $freeVibrationPeriodList
-        })
-          .width('100%').height('20%')
-        ColumnSplit()
-        Text(`阻尼振动`)
-          .textStyle()
-        ColumnSplit()
+        Column({space: 5}){
+          Text(`自由振动`)
+            .textStyle()
+          Column({space: 5}){
+            PhysicalExperimentInputSingleLine({
+              label: `周期`,
+              placeholder: this.freeVibrationPeriod,
+              text: $freeVibrationPeriod,
+              vertical: false
+            })
+            PhysicalExperimentInputMultiLine({
+              label: `周期表格数据`,
+              text: $freeVibrationPeriodListData,
+              vertical: false
+            })
+              .width('100%').height('20%')
+          }.padding({left: 5, right: 5})
+        }
+        Column({space: 5}){
+          Text(`阻尼振动`)
+            .textStyle()
+          Column(){
+            PhysicalExperimentInputMultiLine({
+              label: `振幅表格数据`,
+              text: $dampedVibrationPeriodListData,
+              vertical: false
+            })
+              .width('100%').height('20%')
+          }
+            .padding({left: 5, right: 5})
+        }
         Button(`调试按钮`)
           .onClick(() => {
             // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
-            let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodList)
+            let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodListData)
             this.freeVibrationPeriod = time.toString()
-            console.debug(`调试：${time}`)
+            console.debug(`调试：周期${time}`)
+            if(time != 0){
+              bohrTwistPendulum.processAmplitudeFromTable(this.dampedVibrationPeriodListData)
+            }
           })
       }
         .width('90%').height('100%')

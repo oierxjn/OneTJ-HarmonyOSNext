@@ -1,6 +1,13 @@
-import { GetData } from './DataProcess'
+import { DataDot, GetData } from './DataProcess'
 
 class BohrTwistPendulum {
+  /**
+   * 平均周期
+   */
+  averageTime: number = 0
+  numberOfIntervals = 5
+
+
   /**
    * 从表格数据中得到周期
    *
@@ -11,18 +18,9 @@ class BohrTwistPendulum {
     let processedData = data.split(/\s/)
     let columnNumber = 3
     let resultData: string[][] = []
-    let tempRow: string[] = []
 
-    for(let item of processedData){
-      if(item == undefined || item == ''){
-        continue
-      }
-      tempRow.push(item)
-      if(tempRow.length % columnNumber == 0) {
-        resultData.push(tempRow)
-        tempRow = []
-      }
-    }
+    resultData = GetData.getDataFromList(processedData, columnNumber)
+
     let dataUnit = new GetData(resultData)
 
     if(dataUnit.data.length == 0)return 0
@@ -32,8 +30,49 @@ class BohrTwistPendulum {
       sum += parseFloat(dataUnit.data[i][2])
     }
     let averageTime = sum / dataUnit.data.length
+    this.averageTime = averageTime
     return averageTime
+  }
+  /**
+   * 从表格数据中得到振幅
+   *
+   * @param data
+   * @returns
+   */
+  processAmplitudeFromTable(data: string): number{
+    let processedData = data.split(/\s/)
+    let columnNumber = 3
+    let resultData: string[][] = []
+    resultData = GetData.getDataFromList(processedData, columnNumber)
+
+    let dataUnit = new GetData(resultData)
+    if(dataUnit.data.length == 0)return 0
+
+    /**
+     * 对数逐差法
+     */
+    dataUnit.dataAddColumnByFunc((row: string[])=>{
+      /**
+       * \beta &= \frac{ln\theta _{n}-ln\theta _{n+5}}{5T}
+       */
+      return [((Math.log(parseFloat(row[1]))-Math.log(parseFloat(row[2])))/this.numberOfIntervals/this.averageTime).toString()]
+    })
+    let tempSum = 0
+    for(let item of dataUnit.data){
+      tempSum += parseFloat(item[3])
+    }
+    console.debug(`调试：对数逐差法结果为：${tempSum/dataUnit.data.length}`)
+
+    let amplitudeLogList: DataDot[] = []
+    for(let item of dataUnit.data){
+      amplitudeLogList.push({x: parseInt(item[0]), y: Math.log(parseFloat(item[1]))})
+      amplitudeLogList.push({x: parseInt(item[0])+this.numberOfIntervals, y: Math.log(parseFloat(item[2]))})
+    }
+    let graphSlopeK = GetData.leastSquareFitting(amplitudeLogList).x/-1/this.averageTime
+    console.debug(`调试：图解法斜率结果为：${graphSlopeK}`)
+    return graphSlopeK
   }
 }
 
 export let bohrTwistPendulum = new BohrTwistPendulum()
+

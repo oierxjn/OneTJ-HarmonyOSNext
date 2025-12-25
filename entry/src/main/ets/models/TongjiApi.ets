@@ -235,12 +235,10 @@ class TongjiApi {
         header: TongjiApi.postHeader
       })
       console.debug(`请求成功：${response.responseCode}\n内容：${response.result}`)
-      let result = this.processTokenFromResponse(response.result as string)
-      if(result){
-        await TokenData.storeIntoKV()
-        this.initAuthorizationHeader()
-        return true
-      }
+      this.processTokenFromResponse(response.result as string)
+      await TokenData.storeIntoKV()
+      this.initAuthorizationHeader()
+      return true
     }catch (e) {
       console.error(`错误：${e}`)
     } finally {
@@ -276,15 +274,16 @@ class TongjiApi {
         extraData: formBody,
         header: TongjiApi.postHeader
       })
-      console.debug(`请求成功：${response.responseCode}\n内容：${response.result}`)
-      let result = this.processTokenFromResponse(response.result as string)
-      if(result){
-        await TokenData.storeIntoKV()
-        this.initAuthorizationHeader()
-        return true
+      console.debug(`ONETJ:TongjiApi 刷新Token \n请求成功：${response.responseCode}`)
+      if(response.responseCode != 200){
+        throw new Error(`响应码：${response.responseCode}\n内容：${response.result}`)
       }
+      this.processTokenFromResponse(response.result as string)
+      await TokenData.storeIntoKV()
+      this.initAuthorizationHeader()
+      return true
     } catch (e){
-      console.error(`错误：${e}`)
+      console.error(`ONETJ:TongjiApi 刷新Token \n错误：${JSON.stringify(e)}`)
     } finally {
       httpRequest.destroy()
     }
@@ -304,25 +303,19 @@ class TongjiApi {
     return (currentTime - lastUpdateTime) / 1000 < refreshTokenExpireTime
   }
 
-  private processTokenFromResponse(str: string): boolean{
+  private processTokenFromResponse(str: string): void{
     let tokenData: Object | null;
-    try{
-      tokenData = JSON.parse(str);
-      let accessToken:string = (tokenData as object)?.['access_token']
-      let expiresIn:number = (tokenData as object)?.['expires_in']
-      let refreshToken:string = (tokenData as object)?.['refresh_token']
-      let refreshTokenExpireSec:number = (tokenData as object)?.['refresh_expires_in']
-      TokenData.storeTokenData(
-        accessToken!!,
-        expiresIn!!,
-        refreshToken!!,
-        refreshTokenExpireSec!!
-      )
-      return true
-    }catch (e){
-      console.error(`错误：${e}`)
-    }
-    return false
+    tokenData = JSON.parse(str);
+    let accessToken:string = (tokenData as object)?.['access_token']
+    let expiresIn:number = (tokenData as object)?.['expires_in']
+    let refreshToken:string = (tokenData as object)?.['refresh_token']
+    let refreshTokenExpireSec:number = (tokenData as object)?.['refresh_expires_in']
+    TokenData.storeTokenData(
+      accessToken!!,
+      expiresIn!!,
+      refreshToken!!,
+      refreshTokenExpireSec!!
+    )
   }
 
   async autoLogin(refreshFlag?: boolean): Promise<boolean>{

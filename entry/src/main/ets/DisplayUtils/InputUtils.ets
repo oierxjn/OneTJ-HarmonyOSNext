@@ -43,9 +43,7 @@ export struct PhysicalExperimentInputSingleLine{
           placeholder: this.placeholder,
         })
           .width(this.inputBoxWidth())
-          .backgroundColor('#30114514')
       }
-        .backgroundColor('#30984514')
         .width('100%')
         .alignItems(VerticalAlign.Center)
     }
@@ -59,27 +57,38 @@ export struct PhysicalExperimentInputMultiLine{
   @Link text: ResourceStr
   labelFontSize: string | number | Resource = 16
   vertical: boolean = true
+
+  textWidth(): string | number | Resource {
+    return this.vertical? '100%' :'30%'
+  }
+  inputBoxWidth(): string | number | Resource {
+    return this.vertical? '100%' : '70%'
+  }
+
   build() {
     if(this.vertical){
       Column(){
         Text(this.label)
           .fontSize(this.labelFontSize)
           .align(Alignment.Start)
-          .width('100%')
+          .width(this.textWidth())
         TextArea({
           text: $$this.text,
           placeholder: this.placeholder,
         })
+          .width(this.inputBoxWidth())
           .height('80%')
       }
     }else {
       Row(){
         Text(this.label)
           .fontSize(this.labelFontSize)
+          .width(this.textWidth())
         TextArea({
           text: $$this.text,
           placeholder: this.placeholder,
         })
+          .width(this.inputBoxWidth())
           .height('100%')
       }
     }

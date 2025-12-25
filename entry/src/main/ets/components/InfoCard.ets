@@ -24,13 +24,13 @@ export struct CommonInfoCard {
     }
     .width('100%')
     .height('100%')
+    .padding('10%')
     .border({
       width: 1,
       radius: '5%'
     })
   }
 }
-
 
 
 @Component

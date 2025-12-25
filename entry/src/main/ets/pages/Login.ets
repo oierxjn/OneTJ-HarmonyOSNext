@@ -21,7 +21,7 @@ export enum PageName{
 export enum PhysicalExperimentSub{
   BohrTwistPendulumPage = 'Page_Physical_Experiment_Bohr_Twist_Pendulum',
 }
-// TODO 不进行令牌刷新
+
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
@@ -80,6 +80,7 @@ struct Login {
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
     }
+    await wallpaperTask
   }
 
   async autoLogin(refreshFlag: boolean = REFRESH_TOKEN): Promise<boolean>{
