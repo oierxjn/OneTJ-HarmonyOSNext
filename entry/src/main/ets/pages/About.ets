@@ -1,6 +1,6 @@
 import common from '@ohos.app.ability.common'
 import bundleManager from '@ohos.bundle.bundleManager'
-import { bundleInfo } from './Login'
+import { bundleInfo, PageName } from './Login'
 
 @Extend(Text)
 function titleTextStyle(){
@@ -8,11 +8,21 @@ function titleTextStyle(){
   .textAlign(TextAlign.Start)
   .width('100%')
 }
+@Extend(Column)
+function cardStyle(backgroundColor: ResourceColor){
+  .border({
+    width: 10,
+    radius: 5,
+    color: '#00000000'
+  })
+  .backgroundColor(backgroundColor)
+}
 
 @Component
 export struct About{
   @State colorTheme: Array<[string, number]> =[['#ff32d043', 0.0], ['#ffff4136', 1]]
 
+  @Consume('navPathStack')navPathStack: NavPathStack
   build() {
     NavDestination(){
       Column({space: 10}){
@@ -33,6 +43,18 @@ export struct About{
           .fontSize(25)
           .textAlign(TextAlign.Center)
         // Text(`在信息化办公室指导下研发完成`)
+        Blank()
+        Column(){
+          Text(`查看隐私政策`)
+            .fontSize(25)
+            .textAlign(TextAlign.Center)
+        }
+          .cardStyle('#30A9B0AA')
+          .width('80%').height(50)
+          .onClick(()=>{
+            this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
+          })
+
         Blank()
         Text(`Based on Tongji Open Platform APIs`)
           .fontSize(16)
