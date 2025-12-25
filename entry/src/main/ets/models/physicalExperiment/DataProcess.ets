@@ -104,12 +104,8 @@ export class GetData{
     return this
   }
 
-  isEmpty(){
 
-  }
-
-
-  printData(tag: string = 'Debug'){
+  printData(tag: string = 'Debug', print: (message: string)=>void = console.debug){
     let data = this.data
     let printData: string = ''
     for (let line of data) {
@@ -118,6 +114,6 @@ export class GetData{
       }
       printData += '\n'
     }
-    console.debug(`${tag} ${printData}`)
+    print(`${tag} ${printData}`)
   }
 }

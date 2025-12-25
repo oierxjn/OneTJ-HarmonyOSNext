@@ -2,10 +2,18 @@ import { Markdown } from "@luvi/lv-markdown-in"
 import { PhysicalExperimentInputMultiLine, PhysicalExperimentInputSingleLine } from "../../DisplayUtils/InputUtils"
 import { FailureCode } from "@ohos.app.ability.CompletionHandlerForAtomicService"
 import { bohrTwistPendulum } from "../../models/physicalExperiment/BohrTwistPendulum"
+import { PromptAction } from "@kit.ArkUI"
 
 @Extend(Text)
-function textStyle(){
+function titleTextStyle(){
   .fontSize(26)
+  .textAlign(TextAlign.Start)
+  .width('100%')
+}
+
+@Extend(Text)
+function normalTextStyle(){
+  .fontSize(20)
   .textAlign(TextAlign.Start)
   .width('100%')
 }
@@ -14,15 +22,22 @@ function textStyle(){
 @Component
 export struct BohrTwistPendulum{
   @State freeVibrationPeriod: string = (1.5700).toString()
-  @State freeVibrationPeriodListData: string = ``
-  @State dampedVibrationPeriodListData: string = ``
+  @State freeVibrationPeriodListData: string = `1 160 1.5625 2 159 1.5626 3 158 1.5627`
+  @State dampedVibrationPeriodListData: string = `1 173 102 2 156 91 3 140 82 4 126 73 5 114 66`
+
+  @State buttonText: string = `计算`
+
+  @State logAnswer: string = ``
+  @State graphAnswer: string = ``
+
+  promptAction: PromptAction = this.getUIContext().getPromptAction()
 
   build() {
     NavDestination(){
       Column() {
         Column({space: 5}){
           Text(`自由振动`)
-            .textStyle()
+            .titleTextStyle()
           Column({space: 5}){
             PhysicalExperimentInputSingleLine({
               label: `周期`,
@@ -40,7 +55,7 @@ export struct BohrTwistPendulum{
         }
         Column({space: 5}){
           Text(`阻尼振动`)
-            .textStyle()
+            .titleTextStyle()
           Column(){
             PhysicalExperimentInputMultiLine({
               label: `振幅表格数据`,
@@ -51,18 +66,38 @@ export struct BohrTwistPendulum{
           }
             .padding({left: 5, right: 5})
         }
-        Button(`调试按钮`)
+        Button(this.buttonText)
           .onClick(() => {
             // console.debug(`调试：文本内容${this.freeVibrationPeriodList}`)
             let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodListData)
-            this.freeVibrationPeriod = time.toString()
             console.debug(`调试：周期${time}`)
             if(time != 0){
-              bohrTwistPendulum.processAmplitudeFromTable(this.dampedVibrationPeriodListData)
+              this.freeVibrationPeriod = time.toString()
+            }else{
+              bohrTwistPendulum.averageTime = parseFloat(this.freeVibrationPeriod)
             }
+            bohrTwistPendulum.processAmplitudeFromTable(this.dampedVibrationPeriodListData)
+            if(Math.random() < 0.3){
+              this.buttonText = `Bingo`
+            }else{
+              this.buttonText = `再次计算`
+            }
+            this.logAnswer = bohrTwistPendulum.logSlopeK.toString()
+            this.graphAnswer = bohrTwistPendulum.graphSlopeK.toString()
           })
+        Column({space: 5}){
+          Text(`计算结果`)
+            .titleTextStyle()
+          Column({space: 5}){
+            Text(`对数逐差法：${this.logAnswer}`)
+              .normalTextStyle()
+            Text(`作图法：${this.graphAnswer}`)
+              .normalTextStyle()
+          }
+        }
       }
         .width('90%').height('100%')
+
     }
   }
 }

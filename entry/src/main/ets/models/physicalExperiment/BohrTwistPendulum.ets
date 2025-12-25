@@ -5,8 +5,9 @@ class BohrTwistPendulum {
    * 平均周期
    */
   averageTime: number = 0
-  numberOfIntervals = 5
-
+  numberOfIntervals: number = 5
+  logSlopeK: number = 0
+  graphSlopeK: number = 0
 
   /**
    * 从表格数据中得到周期
@@ -39,14 +40,14 @@ class BohrTwistPendulum {
    * @param data
    * @returns
    */
-  processAmplitudeFromTable(data: string): number{
+  processAmplitudeFromTable(data: string): void{
     let processedData = data.split(/\s/)
     let columnNumber = 3
     let resultData: string[][] = []
     resultData = GetData.getDataFromList(processedData, columnNumber)
 
     let dataUnit = new GetData(resultData)
-    if(dataUnit.data.length == 0)return 0
+    if(dataUnit.data.length == 0)return
 
     /**
      * 对数逐差法
@@ -61,7 +62,8 @@ class BohrTwistPendulum {
     for(let item of dataUnit.data){
       tempSum += parseFloat(item[3])
     }
-    console.debug(`调试：对数逐差法结果为：${tempSum/dataUnit.data.length}`)
+    this.logSlopeK = tempSum/dataUnit.data.length
+    console.debug(`对数逐差法结果为：${this.logSlopeK}`)
 
     let amplitudeLogList: DataDot[] = []
     for(let item of dataUnit.data){
@@ -69,8 +71,8 @@ class BohrTwistPendulum {
       amplitudeLogList.push({x: parseInt(item[0])+this.numberOfIntervals, y: Math.log(parseFloat(item[2]))})
     }
     let graphSlopeK = GetData.leastSquareFitting(amplitudeLogList).x/-1/this.averageTime
-    console.debug(`调试：图解法斜率结果为：${graphSlopeK}`)
-    return graphSlopeK
+    this.graphSlopeK = graphSlopeK
+    console.debug(`图解法斜率结果为：${graphSlopeK}`)
   }
 }
 
