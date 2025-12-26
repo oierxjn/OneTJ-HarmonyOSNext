@@ -11,7 +11,7 @@ class HShaderStyleModifier implements AttributeModifier<TextAttribute>{
   }
   constructor(colorTheme: Array<[string, number]>) {
     console.debug(`调试：调用构造函数`)
-    this.colorTheme = colorTheme
+    this.colorTheme = colorTheme//去掉这一句也会正常显示
   }
 }
 
@@ -26,7 +26,7 @@ struct Login {
   build() {
     Column({space : '20%'}) {
       Text(this.appTitle)
-        .attributeModifier(this.shaderStyleModifier)
+        .attributeModifier(this.shaderStyleModifier)//去掉这一句就会正常显示
     }
   }
 }
