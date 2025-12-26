@@ -7,26 +7,28 @@ import { HelpSub } from "../Login"
 
 @Extend(Text)
 function titleTextStyle(){
-  .fontSize(26)
+  .fontSize(18)
+  .fontWeight(FontWeight.Bold)
   .textAlign(TextAlign.Start)
   .width('100%')
+  .margin({ bottom: 12 })
 }
 
 @Extend(Text)
 function normalTextStyle(){
-  .fontSize(20)
+  .fontSize(16)
+  .fontColor('#666666')
   .textAlign(TextAlign.Start)
   .width('100%')
 }
 
 @Extend(Column)
-function cardStyle(backgroundColor: ResourceColor){
-  .border({
-    width: 10,
-    radius: 5,
-    color: '#00000000'
-  })
-  .backgroundColor(backgroundColor)
+function cardStyle(){
+  .backgroundColor(Color.White)
+  .borderRadius(16)
+  .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+  .padding(16)
+  .width('100%')
 }
 
 @Component
@@ -46,81 +48,97 @@ export struct BohrTwistPendulum{
 
   build() {
     NavDestination(){
-      Column() {
-        Column({space: 5}){
-          Text(`自由振动`)
-            .titleTextStyle()
-          Column({space: 5}){
-            PhysicalExperimentInputSingleLine({
-              label: `周期`,
-              placeholder: this.freeVibrationPeriod,
-              text: $freeVibrationPeriod,
-              vertical: false
-            })
-            PhysicalExperimentInputMultiLine({
-              label: `周期表格数据`,
-              text: $freeVibrationPeriodListData,
-              vertical: false
-            })
-              .width('100%').height('20%')
-          }.padding({left: 5, right: 5})
-        }
-          .cardStyle('#60DCE5D6')
-        Column({space: 5}){
-          Text(`阻尼振动`)
-            .titleTextStyle()
+      Scroll() {
+        Column({space: 16}) {
           Column(){
-            PhysicalExperimentInputMultiLine({
-              label: `振幅表格数据`,
-              text: $dampedVibrationPeriodListData,
-              vertical: false
+            Text(`自由振动`)
+              .titleTextStyle()
+            Column({space: 12}){
+              PhysicalExperimentInputSingleLine({
+                label: `周期`,
+                placeholder: this.freeVibrationPeriod,
+                text: $freeVibrationPeriod,
+                vertical: false
+              })
+              PhysicalExperimentInputMultiLine({
+                label: `周期表格数据`,
+                text: $freeVibrationPeriodListData,
+                vertical: false
+              })
+                .width('100%').height(100)
+            }
+          }
+            .cardStyle()
+
+          Column(){
+            Text(`阻尼振动`)
+              .titleTextStyle()
+            Column(){
+              PhysicalExperimentInputMultiLine({
+                label: `振幅表格数据`,
+                text: $dampedVibrationPeriodListData,
+                vertical: false
+              })
+                .width('100%').height(100)
+            }
+          }
+            .cardStyle()
+
+          Button(this.buttonText)
+            .onClick(() => {
+              let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodListData)
+              console.debug(`调试：周期${time}`)
+              if(time != 0){
+                this.freeVibrationPeriod = time.toString()
+              }else{
+                bohrTwistPendulum.averageTime = parseFloat(this.freeVibrationPeriod)
+              }
+              bohrTwistPendulum.processAmplitudeFromTable(this.dampedVibrationPeriodListData)
+              if(Math.random() < 0.3){
+                this.buttonText = `Bingo`
+              }else{
+                this.buttonText = `再次计算`
+              }
+              this.logAnswer = bohrTwistPendulum.logSlopeK.toString()
+              this.graphAnswer = bohrTwistPendulum.graphSlopeK.toString()
             })
-              .width('100%').height('20%')
-          }
-            .padding({left: 5, right: 5})
-        }
-          .cardStyle('#30E45D25')
-        Button(this.buttonText)
-          .onClick(() => {
-            let time = bohrTwistPendulum.processTimeFromTable(this.freeVibrationPeriodListData)
-            console.debug(`调试：周期${time}`)
-            if(time != 0){
-              this.freeVibrationPeriod = time.toString()
-            }else{
-              bohrTwistPendulum.averageTime = parseFloat(this.freeVibrationPeriod)
+            .width('100%')
+            .height(44)
+            .borderRadius(22)
+            .backgroundColor('#007DFF')
+            .shadow({ radius: 5, color: 'rgba(0,125,255,0.3)', offsetX: 0, offsetY: 2 })
+
+          if (this.logAnswer || this.graphAnswer) {
+            Column() {
+              Text(`计算结果`)
+                .titleTextStyle()
+              Column({ space: 8 }) {
+                Text(`对数逐差法：${this.logAnswer}`)
+                  .normalTextStyle()
+                Text(`作图法：${this.graphAnswer}`)
+                  .normalTextStyle()
+              }
             }
-            bohrTwistPendulum.processAmplitudeFromTable(this.dampedVibrationPeriodListData)
-            if(Math.random() < 0.3){
-              this.buttonText = `Bingo`
-            }else{
-              this.buttonText = `再次计算`
-            }
-            this.logAnswer = bohrTwistPendulum.logSlopeK.toString()
-            this.graphAnswer = bohrTwistPendulum.graphSlopeK.toString()
-          })
-          .width('100%')
-        Column({space: 5}) {
-          Text(`计算结果`)
-            .titleTextStyle()
-          Column({ space: 5 }) {
-            Text(`对数逐差法：${this.logAnswer}`)
-              .normalTextStyle()
-            Text(`作图法：${this.graphAnswer}`)
-              .normalTextStyle()
+            .cardStyle()
           }
         }
-          .cardStyle('#305556A4')
+        .width('100%')
+        .padding({ left: 16, right: 16, top: 16, bottom: 16 })
       }
-        .width('90%').height('100%')
+      .scrollBar(BarState.Off)
+      .width('100%')
+      .height('100%')
     }
-      .menus([
-        {
-          value: `帮助`,
-          action: ()=>{
-            this.navPathStack.pushPath({name: HelpSub.ExperimentHelpPage})
-          },
-          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.questionmark_circle'))
-        }
-      ])
+    .backgroundColor('#F1F3F5')
+    .title('波尔扭摆实验')
+    .menus([
+      {
+        value: `帮助`,
+        action: ()=>{
+          this.navPathStack.pushPath({name: HelpSub.ExperimentHelpPage})
+        },
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.questionmark_circle'))
+      }
+    ])
   }
 }

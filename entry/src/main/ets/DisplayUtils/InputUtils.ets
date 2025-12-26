@@ -24,25 +24,31 @@ export struct PhysicalExperimentInputSingleLine{
           .align(Alignment.Start)
           .width(this.textWidth())
           .maxLines(1)
+          .fontWeight(FontWeight.Medium)
+          .margin({ bottom: 8 })
         TextInput({
           text: $$this.text,
           placeholder: this.placeholder,
         })
+          .backgroundColor('#F5F5F5')
+          .borderRadius(8)
+          .height(40)
       }
     }else{
       Row(){
         Text(this.label)
           .fontSize(this.labelFontSize)
-          .align(Alignment.Center)
+          .align(Alignment.Start)
           .width(this.textWidth())
-          .onClick(()=>{
-            console.debug(`调试：文本宽度${this.textWidth()}`)
-          })
+          .fontWeight(FontWeight.Medium)
         TextInput({
           text: this.text,
           placeholder: this.placeholder,
         })
           .width(this.inputBoxWidth())
+          .backgroundColor('#F5F5F5')
+          .borderRadius(8)
+          .height(40)
       }
         .width('100%')
         .alignItems(VerticalAlign.Center)
@@ -72,24 +78,31 @@ export struct PhysicalExperimentInputMultiLine{
           .fontSize(this.labelFontSize)
           .align(Alignment.Start)
           .width(this.textWidth())
+          .fontWeight(FontWeight.Medium)
+          .margin({ bottom: 8 })
         TextArea({
           text: $$this.text,
           placeholder: this.placeholder,
         })
           .width(this.inputBoxWidth())
           .height('80%')
+          .backgroundColor('#F5F5F5')
+          .borderRadius(8)
       }
     }else {
       Row(){
         Text(this.label)
           .fontSize(this.labelFontSize)
           .width(this.textWidth())
+          .fontWeight(FontWeight.Medium)
         TextArea({
           text: $$this.text,
           placeholder: this.placeholder,
         })
           .width(this.inputBoxWidth())
           .height('100%')
+          .backgroundColor('#F5F5F5')
+          .borderRadius(8)
       }
     }
   }

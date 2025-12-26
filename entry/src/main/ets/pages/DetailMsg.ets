@@ -30,7 +30,7 @@ async function downloadHTML(htmlStr: string, uiContext: UIContext){
       let writeLength = await fileIo.write(tempFile.fd, htmlStr)
       console.debug(`写入完成，写入长度：${writeLength}`)
     } catch (e){
-      console.error(`下载时出现异常：${JSON.stringify(e)}`)
+      console.error(`下载时出现异常：${e}`)
     } finally {
       if(tempFile){
         await fileIo.close(tempFile)
@@ -78,66 +78,87 @@ export struct DetailMsg {
 
   build() {
     NavDestination() {
-      if (this.loadMode & LoadMode.Fetching) {
-        Text('详情拉取中')
-          .fontSize(30)
-          .fontColor(normalTextColor)
-      } else if (this.loadMode & LoadMode.Rendering) {
-        Text('网页渲染中')
-          .fontSize(30)
-          .fontColor(normalTextColor)
-      } else {
-        Row(){
-          Button(`刷新`)
-            .onClick(() => {
-              this.controller.refresh()
-              console.debug(`网页开始刷新`)
-            })
-            .border({
-              radius: 5,
-              style: BorderStyle.Solid,
-              color: '#99545300'
-            })
-            .width('50%')
-            .fontColor(normalTextColor)
-            .backgroundColor(buttonBackgroundColor)
-          Button(`用其他应用打开`)
-            .onClick(async () => {
-              await downloadHTML(this.htmlStr, this.getUIContext())
-            })
-            .border({
-              radius: 5,
-              style: BorderStyle.Solid,
-              color: '#99545300'
-            })
-            .fontColor(normalTextColor)
-            .width('50%')
-            .backgroundColor('#45000000')
-        }.width('100%')
-      }
-      List(){
-        ListItem(){
-          Web({ src: `data:text/html, <html><body></body></html>`, controller: this.controller })
-            .align(Alignment.Bottom)
-            .WebStyles()
-            .onLoadFinished(() => {
-              this.loadMode &= ~LoadMode.Rendering
-              console.debug(`调试：网页加载完成`)
-            })
-            .onErrorReceive(( event ) => {
-              let request = event.request
-              let error = event.error
-              console.error(`调试：错误码${error.getErrorCode()}\n错误信息：${error.getErrorInfo()}\n对应请求：${request.getRequestUrl()}\n主框架：${request.isMainFrame()}`)
-              return
-            })
-            .onHttpErrorReceive((event) => {
-              console.error(`调试：httpError收到`)
-            })
+      Column() {
+        if (this.loadMode & LoadMode.Fetching) {
+          Column() {
+            Text('详情拉取中')
+              .fontSize(16)
+              .fontColor('#999999')
+          }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+        } else if (this.loadMode & LoadMode.Rendering) {
+          Column() {
+            Text('网页渲染中')
+              .fontSize(16)
+              .fontColor('#999999')
+          }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+        } else {
+          Row({ space: 12 }){
+            Button(`刷新`)
+              .onClick(() => {
+                this.controller.refresh()
+                console.debug(`网页开始刷新`)
+              })
+              .height(40)
+              .layoutWeight(1)
+              .fontColor('#007DFF')
+              .backgroundColor(Color.White)
+              .borderRadius(20)
+              .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+            Button(`用其他应用打开`)
+              .onClick(async () => {
+                await downloadHTML(this.htmlStr, this.getUIContext())
+              })
+              .height(40)
+              .layoutWeight(1)
+              .fontColor('#007DFF')
+              .backgroundColor(Color.White)
+              .borderRadius(20)
+              .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
         }
+        
+        List(){
+          ListItem(){
+            Web({ src: `data:text/html, <html><body></body></html>`, controller: this.controller })
+              .align(Alignment.Bottom)
+              .WebStyles()
+              .onLoadFinished(() => {
+                this.loadMode &= ~LoadMode.Rendering
+                console.debug(`调试：网页加载完成`)
+              })
+              .onErrorReceive(( event ) => {
+                let request = event.request
+                let error = event.error
+                console.error(`调试：错误码${error.getErrorCode()}\n错误信息：${error.getErrorInfo()}\n对应请求：${request.getRequestUrl()}\n主框架：${request.isMainFrame()}`)
+                return
+              })
+              .onHttpErrorReceive((event) => {
+                console.error(`调试：httpError收到`)
+              })
+          }
+          .backgroundColor(Color.White)
+          .borderRadius(16)
+          .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+          .padding(12)
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .padding({ left: 16, right: 16, bottom: 16 })
       }
-      .width('100%').height('95%')
+      .width('100%')
+      .height('100%')
+      .backgroundColor('#F1F3F5')
     }
     .title(this.pageTitle)
+    .backgroundColor('#F1F3F5')
     .onReady(async (context) => {
       let param = context.pathInfo.param as CommonMsgToDetailMsgNavParams
       this.pageTitle = param.title
