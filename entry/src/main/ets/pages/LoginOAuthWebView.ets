@@ -5,6 +5,7 @@ import { OAuthCode } from "../models/UserModel";
 import { buildAlertDialog } from "../DisplayUtils/AlertDialogUtils";
 import { tongjiApi } from "../models/TongjiApi";
 import { PageName } from "./Login";
+import { deviceInfo } from "@kit.BasicServicesKit";
 
 @Extend(Web)
 function WebStyles(){
@@ -12,7 +13,6 @@ function WebStyles(){
   .imageAccess(true)
   .overScrollMode(OverScrollMode.ALWAYS)
   .zoomAccess(true)
-  .forceEnableZoom(true)
   .javaScriptAccess(true)
   .allowWindowOpenMethod(true)
   .mixedMode(MixedMode.All)
@@ -20,11 +20,21 @@ function WebStyles(){
   .forceDarkAccess(true)
 }
 
+class WebModifier implements AttributeModifier<WebAttribute>{
+  applyNormalAttribute(instance: WebAttribute): void {
+    if(deviceInfo.sdkApiVersion >= 21){
+      instance.forceEnableZoom(true)
+    }
+  }
+}
+
 export let loginWebviewTag: string = 'LoginWebView'
 
 @Component
 export struct LoginOAuthWebView {
   @State message: string = 'Hello World';
+
+  @State webModifier: WebModifier = new WebModifier()
 
   @Consume('navPathStack') navPathStack: NavPathStack
   private webController: WebviewController = new webview.WebviewController(loginWebviewTag)
@@ -68,6 +78,7 @@ export struct LoginOAuthWebView {
           return false
         })
         .WebStyles()
+        .attributeModifier(this.webModifier)
     }
     .onBackPressed(() => {
       this.navPathStack.pop()

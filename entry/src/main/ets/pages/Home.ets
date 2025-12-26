@@ -4,9 +4,12 @@ import { buildAlertDialog } from '../DisplayUtils/AlertDialogUtils'
 import { CommonMsgData, ListDataSource, MsgListDataSource, TextSectionAttribute } from '../DisplayUtils/DataUtils'
 import { tongjiApi } from '../models/TongjiApi'
 import { MsgList, SchoolCalendarInfo, StudentInfo } from '../models/UserModel'
+import { NavDestinationModifier } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 
 
 export let msgTextSectionAttribute: TextSectionAttribute = new TextSectionAttribute()
+
 
 @Component
 export struct Home {
@@ -22,7 +25,6 @@ export struct Home {
 
   @State isInfoBoardFolded: boolean = false
   @State termSimpleName: string = '1919-9178学年度第0学期 第13周'
-
 
   async aboutToAppear(): Promise<void> {
     msgTextSectionAttribute.maxLines = 3
@@ -152,7 +154,7 @@ export struct Home {
       .margin({top: '10%', left: '5%', right: '5%'})
       .width('90%').height('100%')
     }
-    .hideBackButton(true)
+    .hideTitleBar(true)
     .onBackPressed(() => {
       return true
     })

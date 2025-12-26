@@ -1,6 +1,7 @@
 import common from '@ohos.app.ability.common'
 import bundleManager from '@ohos.bundle.bundleManager'
 import { bundleInfo, PageName } from './Login'
+import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Extend(Text)
 function titleTextStyle(){
@@ -18,9 +19,27 @@ function cardStyle(backgroundColor: ResourceColor){
   .backgroundColor(backgroundColor)
 }
 
+class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
+  colorTheme: Array<[string, number]> = [['#ff32d043', 0.0], ['#ffff4136', 1]]
+
+  applyNormalAttribute(instance: TextAttribute): void {
+    if(deviceInfo.sdkApiVersion >= 20){
+      instance.shaderStyle({
+        direction: GradientDirection.Right,
+        colors: this.colorTheme
+      })
+    }
+  }
+  constructor(colorTheme: Array<[string, number]>) {
+    this.colorTheme = colorTheme
+  }
+}
+
 @Component
 export struct About{
   @State colorTheme: Array<[string, number]> =[['#ff32d043', 0.0], ['#ffff4136', 1]]
+
+  shaderStyleModifier = new ShaderStyleModifier(this.colorTheme)
 
   @Consume('navPathStack')navPathStack: NavPathStack
   build() {
@@ -31,11 +50,9 @@ export struct About{
           .borderRadius('20%')
         Text($r('app.string.EntryAbility_label'))
           .fontSize(40)
+          .fontFamily('')
           .textAlign(TextAlign.Center)
-          .shaderStyle({
-            direction: GradientDirection.Right,
-            colors: this.colorTheme
-          })
+          .attributeModifier(this.shaderStyleModifier)
         Text($r('app.string.Version_name'))
           .fontSize(25)
           .textAlign(TextAlign.Center)

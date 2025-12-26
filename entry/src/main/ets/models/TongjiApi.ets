@@ -163,7 +163,7 @@ class TongjiApi {
       )
       return true
     }catch (e){
-      console.error(`错误：${e}`)
+      console.error(`错误：${JSON.stringify(e)}`)
       return false
     }finally {
       httpRequest.destroy()

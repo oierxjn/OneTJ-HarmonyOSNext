@@ -15,6 +15,8 @@ import { About } from './About';
 import { JoinGroup } from './JoinGroup';
 import { Settings } from './Settings';
 import { PrivacyPolicy } from './PrivacyPolicy';
+import { deviceInfo } from '@kit.BasicServicesKit';
+import { font } from '@kit.ArkUI';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -41,6 +43,26 @@ export let bundleInfo: undefined | bundleManager.BundleInfo
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
+class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
+  backgroundOpacity: number = 0
+  colorTheme: Array<Array<[string, number]>> = [
+    [['#FF000000', 0.0], ['#FF000000', 1]],
+    [['#ff32d043', 0.0], ['#ffff4136', 1]]
+  ]
+
+  applyNormalAttribute(instance: TextAttribute): void {
+    if(deviceInfo.sdkApiVersion >= 20){
+      instance.shaderStyle({
+        direction: GradientDirection.Right,
+        colors: this.colorTheme[this.backgroundOpacity]
+      })
+    }
+  }
+  constructor(backgroundOpacity: number, colorTheme: Array<Array<[string, number]>>) {
+    this.backgroundOpacity = backgroundOpacity
+    this.colorTheme = colorTheme
+  }
+}
 
 
 
@@ -52,15 +74,29 @@ struct Login {
   @State loginButtonText: Resource | string = $r('app.string.Uni_login');
   @State allowLogin: boolean = false;
   @State wallpaper: string | image.PixelMap = '#40942610'
-  @State backgroundOpacity: number = 0;
+  @State @Watch('onBackgroundOpacityChanged')backgroundOpacity: number = 0;
 
-  @State colorTheme: Array<Array<[string, number]>> = [
+  @State @Watch('onColorThemeChanged')colorTheme: Array<Array<[string, number]>> = [
     [['#FF000000', 0.0], ['#FF000000', 1]],
     [['#ff32d043', 0.0], ['#ffff4136', 1]]
   ]
 
+  shaderStyleModifier = new ShaderStyleModifier(this.backgroundOpacity, this.colorTheme)
+
+  onBackgroundOpacityChanged(){
+    this.shaderStyleModifier.backgroundOpacity = this.backgroundOpacity
+  }
+  onColorThemeChanged(){
+    this.shaderStyleModifier.colorTheme = this.colorTheme
+  }
+
+  uiContext = this.getUIContext()
+  promptAction = this.uiContext.getPromptAction()
+
+
   @Provide('navPathStack') navPathStack: NavPathStack = new NavPathStack()
 
+  // 导航图 pageMap
   @Builder
   pageMap(name: string){
     if(name == PageName.HomePage){
@@ -89,7 +125,12 @@ struct Login {
   }
 
   async aboutToAppear(): Promise<void> {
-    console.debug(`调试：进入Appear`)
+    // 轻量字体设置
+    this.getUIContext().getFont().registerFont({
+      familyName: 'SanJiPoMoTi',
+      familySrc: $rawfile('font/SanJiPoMoTi-2-slim.ttf')
+    })
+
     this.loginButtonText = '自动登录中'
     this.allowLogin = false
 
@@ -112,7 +153,6 @@ struct Login {
 
   async getBundleInfo(){
     bundleInfo = await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT)
-    console.debug(`调试：bundleInfo:${JSON.stringify(bundleInfo)}`)
   }
 
   async autoLogin(refreshFlag: boolean = REFRESH_TOKEN): Promise<boolean>{
@@ -133,10 +173,13 @@ struct Login {
 
   async setWallPaper(){
     console.debug(`准备开始设置壁纸`)
-    if(await fetchNewWallpaper(this.getUIContext())){
+    try {
+      await fetchNewWallpaper(this.getUIContext())
       this.wallpaper = wallpaperPixelMap!!
       this.backgroundOpacity = 1
       console.debug(`壁纸设置完成`)
+    } catch (e){
+      this.promptAction.showToast({message: `壁纸设置时发生错误：${JSON.stringify(e)}`})
     }
   }
 
@@ -158,10 +201,7 @@ struct Login {
             .onClick(() => {
               this.appTitle = 'Welcome';
             })
-            .shaderStyle({
-              direction: GradientDirection.Right,
-              colors: this.colorTheme[this.backgroundOpacity]
-            })
+            .attributeModifier(this.shaderStyleModifier)
 
           Column(){
             Button(this.loginButtonText)

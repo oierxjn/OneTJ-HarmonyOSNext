@@ -4,6 +4,7 @@ import { XJNUrlConstants } from "../constants/WebUrlConstants";
 import image from "@ohos.multimedia.image";
 import { ImageAnimatorModifier } from "@kit.ArkUI";
 import util from "@ohos.util";
+import { deviceInfo } from "@kit.BasicServicesKit";
 
 export function asyncSleep(ms: number): Promise<void>{
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -114,7 +115,7 @@ export async function checkOldWallpaper(context: UIContext): Promise<boolean>{
   return false
 }
 
-export async function fetchNewWallpaper(context: UIContext): Promise<boolean>{
+export async function fetchNewWallpaper(context: UIContext): Promise<void>{
   const wallpaperFilePath = context.getHostContext()?.cacheDir + '/wallpaper.jpg'
   let downloader = new Downloader()
   try{
@@ -124,15 +125,24 @@ export async function fetchNewWallpaper(context: UIContext): Promise<boolean>{
     console.debug(`调试：准备开始下载壁纸`)
     let responseCode = await downloader.get(getWallpaperUrl())
     console.debug(`调试：壁纸下载完成`)
-    let pixelMap = await image.createImageSource(downloader.finalArrayBuffer).createPixelMapUsingAllocator(
-      {  },
-      image.AllocatorType.DMA
-    )
+    let imageSource = image.createImageSource(downloader.finalArrayBuffer)
+    let pixelMap: image.PixelMap
+
+    /*
+     * createPixelMapUsingAllocator的兼容性判断
+     */
+    if(deviceInfo.sdkApiVersion >= 15) {
+      pixelMap = await imageSource.createPixelMapUsingAllocator(
+        {},
+        image.AllocatorType.DMA
+      )
+    }else{
+      pixelMap = await imageSource.createPixelMap()
+    }
     wallpaperPixelMap = pixelMap
-    return true
   } catch (e){
     console.error(`ONETJ:Funcs 获取壁纸时发生错误：${(e as BusinessError).message}\n${(e as BusinessError).stack}`)
-    return false
+    throw e as Error
   } finally {
     downloader.destroy()
   }
