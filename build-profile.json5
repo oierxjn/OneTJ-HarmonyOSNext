@@ -1,26 +1,13 @@
 {
   "app": {
     "signingConfigs": [
-      {
-        "name": "default",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\wenji\\.ohos\\config\\default_OneTJ-HarmonyOSNext-main_I2_-8IM4jsxUNbn-nQmqd7JpulEH6AYf5wAN9NLony4=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001AC65AC852EA88123400048DD7B3DBE50665C9D7F58F2D63B0800F0578950FE5E5DA5C5DA717A3",
-          "profile": "C:\\Users\\wenji\\.ohos\\config\\default_OneTJ-HarmonyOSNext-main_I2_-8IM4jsxUNbn-nQmqd7JpulEH6AYf5wAN9NLony4=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\wenji\\.ohos\\config\\default_OneTJ-HarmonyOSNext-main_I2_-8IM4jsxUNbn-nQmqd7JpulEH6AYf5wAN9NLony4=.p12",
-          "storePassword": "0000001AEB438AEAF7D9AB9C93A8CADF513184624C2BF1AE16A1701846F82B2F3622B19E660D474FA561"
-        }
-      }
     ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
         "targetSdkVersion": "6.0.1(21)",
-        "compatibleSdkVersion": "6.0.1(21)",
+        "compatibleSdkVersion": "5.0.1(13)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
