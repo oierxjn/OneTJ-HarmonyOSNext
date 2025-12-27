@@ -79,6 +79,7 @@ export struct LoginOAuthWebView {
         })
         .WebStyles()
         .attributeModifier(this.webModifier)
+        .width('90%')
     }
     .onBackPressed(() => {
       this.navPathStack.pop()

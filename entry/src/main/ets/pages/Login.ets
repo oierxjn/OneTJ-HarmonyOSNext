@@ -195,7 +195,7 @@ struct Login {
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       Navigation(this.navPathStack){
         Column({space : '20%'}) {
-          Text(this.appTitle)
+          Text(this.backgroundOpacity ? this.appTitle : this.appTitle)
             .id('title_text')
             .fontSize($r('app.float.page_text_font_size')).fontWeight(FontWeight.Bold)
             .onClick(() => {

@@ -31,7 +31,8 @@ class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
     }
   }
   constructor(colorTheme: Array<[string, number]>) {
-    this.colorTheme = colorTheme
+    this.colorTheme[0] = colorTheme[0]
+    this.colorTheme[1] = colorTheme[1]
   }
 }
 
