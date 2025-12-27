@@ -29,7 +29,7 @@ export struct Home {
   async aboutToAppear(): Promise<void> {
     msgTextSectionAttribute.maxLines = 3
     let studentInfoTask = this.createStudentInfoTask()
-    let termInfoTask = this.createTermInfoTask() // TODO 不进行学期刷新
+    let termInfoTask = this.createTermInfoTask()
     let msgListTask = this.createMsgListTask()
 
     await Promise.all([studentInfoTask, termInfoTask, msgListTask])
@@ -74,17 +74,20 @@ export struct Home {
     await SchoolCalendarInfo.initKV()
     await SchoolCalendarInfo.loadFromKV()
     if(!SchoolCalendarInfo.isFetched){
-      if(!await tongjiApi.getSchoolCalendarInfo()){
-        console.error('获取学期信息失败')
-        return
-      }
+      console.error(`错误：本地缓存学期信息读取失败`)
+    }
+    if(!await tongjiApi.getSchoolCalendarInfo()){
+      console.error('错误：联网获取学期信息失败')
+    }
+    if(!SchoolCalendarInfo.isFetched){
+      return
     }
     try {
       this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
+      await SchoolCalendarInfo.storeIntoKV()
     } catch (e){
-      console.error(`出现异常：${e}`)
+      console.error(`ONETJ:Home 出现异常：${e}`)
     }
-    await SchoolCalendarInfo.storeIntoKV()
   }
 
   titleFontSize: number = 25;
@@ -99,8 +102,6 @@ export struct Home {
               Image(this.avatarSrc)
                 .width(64)
                 .height(64)
-                .clip(new Circle())
-                .objectFit(ImageFit.Cover)
               
               Column({ space: 6 }) {
                 Text(this.studentNameAndId)

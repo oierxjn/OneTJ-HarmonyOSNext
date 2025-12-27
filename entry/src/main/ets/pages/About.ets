@@ -98,18 +98,16 @@ export struct About{
             .fontColor('#666666')
             .textAlign(TextAlign.Center)
         }
-        .width('100%')
-        .padding(24)
-        .backgroundColor(Color.White)
-        .borderRadius(16)
-        .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
-      }
-      .width('100%')
-      .height('100%')
-      .padding(16)
-      .backgroundColor('#F1F3F5')
+          .width('100%')
+          .padding(24)
+          .backgroundColor(Color.White)
+          .borderRadius(16)
+          .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
     }
-    .title(`关于本app`)
+    .width('100%')
+    .height('100%')
+    .padding(16)
     .backgroundColor('#F1F3F5')
+    .title(`关于本app`)
   }
 }

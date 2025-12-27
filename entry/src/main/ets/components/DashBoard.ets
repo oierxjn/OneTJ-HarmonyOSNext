@@ -5,7 +5,6 @@ import { webview } from "@kit.ArkWeb"
 import { loginWebviewTag } from "../pages/LoginOAuthWebView"
 import { PageName } from "../pages/Login"
 
-// TODO 主要功能
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
   [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: (navPathStack) => {
     navPathStack.pushPath({name: PageName.StudentTimeTablePage})
@@ -13,23 +12,27 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   [HomeFunctions.NONE]: (): void => {
     return
   },
-  [HomeFunctions.SETTINGS]: (): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.SETTINGS]: (navPathStack): void => {
+    navPathStack.pushPath({name: PageName.SettingsPage})
   },
   [HomeFunctions.ABOUT]: (navPathStack: NavPathStack): void => {
     navPathStack.pushPath({name: PageName.AboutPage})
   },
-  [HomeFunctions.LOGOUT]: (navPathStack): void => {
+  [HomeFunctions.LOGOUT]: (navPathStack, context): void => {
     setTimeout(async () =>{
       tongjiApi.switchRequire = true
-      let clearLoginDataTask = tongjiApi.clearLoginData()
-      let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
-      navPathStack.pop()
-      await Promise.all([clearLoginDataTask, clearLoginCookie])
+      try {
+        let clearLoginDataTask = tongjiApi.clearLoginData()
+        let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
+        navPathStack.pop()
+        await Promise.all([clearLoginDataTask, clearLoginCookie])
+      } catch (e){
+        context?.getPromptAction().showToast({ message: '清理本地数据失败' })
+      }
     })
   },
-  [HomeFunctions.JOIN_QQ_GROUP]: (_, context): void => {
-    throw new Error("Function not implemented.")
+  [HomeFunctions.JOIN_QQ_GROUP]: (navPathStack: NavPathStack, context): void => {
+    navPathStack.pushPath({name: PageName.JoinGroupPage})
   },
   [HomeFunctions.EXP_CALC]: (navPathStack: NavPathStack): void => {
     navPathStack.pushPath({name: PageName.PhysicalExperimentPage})
