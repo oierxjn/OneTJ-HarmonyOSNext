@@ -3,6 +3,7 @@ import { http } from "@kit.NetworkKit";
 import { CourseInfo, CourseInfoList, MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
+import { ErrorCode } from "@kit.AbilityKit";
 import { CommonMsgData } from "../DisplayUtils/DataUtils";
 import { BusinessError } from "@kit.BasicServicesKit";
 
@@ -21,17 +22,12 @@ class TongjiApi {
     try{
       let TokenDataTask = TokenData.clearFromKV()
       let StudentInfoTask = StudentInfo.clearFromKV()
-      let CourseInfoListTask = CourseInfoList.clearFromKV()
-      let SchoolCalenderInfoTask = SchoolCalendarInfo.clearFromKV()
-      await Promise.all([TokenDataTask, StudentInfoTask, CourseInfoListTask, SchoolCalenderInfoTask])
+      await Promise.all([TokenDataTask, StudentInfoTask])
     } catch (e){
       console.error(`清除数据库数据时发生错误：${e}`)
-      throw e as Error
     } finally {
       TokenData.isFetched = false
       StudentInfo.isFetched = false
-      CourseInfoList.isFetched = false
-      SchoolCalendarInfo.isFetched = false
     }
   }
 
@@ -62,7 +58,7 @@ class TongjiApi {
       let content: string = (responseData as object)?.['content']
       return content
     } catch (e){
-      console.error(`请求通知详情时发生错误：${JSON.stringify(e)}`)
+      console.error(`请求通知详情时发生错误：${JSON.stringify(e as object)}`)
       return null
     } finally {
       httpRequest.destroy()

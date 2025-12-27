@@ -73,34 +73,43 @@ export struct About{
             this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
           })
 
-        Blank()
-        Text(`Based on Tongji Open Platform APIs`)
-          .fontSize(16)
-          .fontWeight(FontWeight.Lighter)
-          .textAlign(TextAlign.Center)
-        Text(){
-          Span(`Developed by XJN`)
-          ImageSpan($r('app.media.oierxjn'))
-            .verticalAlign(ImageSpanAlignment.CENTER)
-            .borderRadius('20%')
-            .height(20)
-          Span(` , and from GTY`)
-          ImageSpan($r('app.media.GuanTouYu'))
-            .verticalAlign(ImageSpanAlignment.CENTER)
-            .borderRadius('20%')
-            .height(20)
+          Divider().color('#F1F3F5').margin({ top: 10, bottom: 10 })
+
+          Text(`Based on Tongji Open Platform APIs`)
+            .fontSize(14)
+            .fontColor('#666666')
+            .textAlign(TextAlign.Center)
+
+          Text(){
+            Span(`Developed by XJN`)
+            ImageSpan($r('app.media.oierxjn'))
+              .verticalAlign(ImageSpanAlignment.CENTER)
+              .borderRadius(10)
+              .height(20)
+              .margin({ left: 4, right: 4 })
+            Span(` , and from GTY`)
+            ImageSpan($r('app.media.GuanTouYu'))
+              .verticalAlign(ImageSpanAlignment.CENTER)
+              .borderRadius(10)
+              .height(20)
+              .margin({ left: 4 })
+          }
+            .fontSize(14)
+            .fontColor('#666666')
+            .textAlign(TextAlign.Center)
         }
-          .fontSize(16)
-          .fontWeight(FontWeight.Lighter)
-          .textAlign(TextAlign.Center)
-        // Column(){
-        //   Text(`    这是`)
-        // }
-        //   .width('100%')
+        .width('100%')
+        .padding(24)
+        .backgroundColor(Color.White)
+        .borderRadius(16)
+        .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
       }
-        .width('100%').height('100%')
-        .padding({left: 20, right: 20, top: 40, bottom: 10})
+      .width('100%')
+      .height('100%')
+      .padding(16)
+      .backgroundColor('#F1F3F5')
     }
     .title(`关于本app`)
+    .backgroundColor('#F1F3F5')
   }
 }
