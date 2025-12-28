@@ -66,7 +66,7 @@ export struct Home {
       // TODO BUG : 未知Bug，应当在空闲时间上报
       this.currentGrade = StudentInfo.currentGrade + '级'
     } catch (e){
-      console.error(`出现异常：${e}`)
+      console.error(`出现异常：${JSON.stringify(e)}`)
     }
     await StudentInfo.storeIntoKV()
   }
@@ -135,7 +135,7 @@ export struct Home {
         .borderRadius(16)
         .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
         .onClick(() => {
-          animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
+          this.getUIContext().animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
             this.isInfoBoardFolded = !this.isInfoBoardFolded
           })
         })
@@ -159,14 +159,14 @@ export struct Home {
           })
         }
         .layoutWeight(1)
-        .width('100%')
+        .width('100%').height('auto')
         .scrollBar(BarState.Off)
         .onAreaChange((_ ,area) => {
           msgTextSectionAttribute.constraintWidth = Number(area.width) * 0.85
         })
       }
-      .width('100%')
-      .height('100%')
+      .width('100%').height('100%')
+      .expandSafeArea()
       .backgroundColor('#F1F3F5')
       .padding({ left: 16, right: 16, top: 16 })
     }

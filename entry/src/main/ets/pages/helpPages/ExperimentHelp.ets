@@ -88,9 +88,9 @@ export struct ExperimentHelp{
           .padding({ left: 16, right: 16, top: 16, bottom: 16 })
           .width('100%')
       }
-        .width('100%')
-        .height('100%')
+        .width('100%').height('100%')
         .scrollBar(BarState.Off)
+        .align(Alignment.Top)
     }
       .title(`帮助：物理实验`)
       .backgroundColor('#F1F3F5')

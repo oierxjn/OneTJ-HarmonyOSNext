@@ -3,7 +3,9 @@ import { CourseInfoListDataSource } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
 import { CourseInfo, CourseInfoList, SchoolCalendarInfo } from '../models/UserModel';
 import { JSON } from '@kit.ArkTS';
-import { getRandomSingleElementFromArray } from '../components/Funcs';
+import { AsyncLock, getRandomSingleElementFromArray, TaskStatusManager } from '../components/Funcs';
+
+let courseInfoGetStatusManager: TaskStatusManager = new TaskStatusManager(`CourseInfoGetStatusManager`)
 
 @Component
 export struct StudentTimeTable {
@@ -16,43 +18,27 @@ export struct StudentTimeTable {
   private tabPageController: TabsController = new TabsController();
 
   async aboutToAppear(){
-    // TODO: 测试数据，正式使用时请删除
-    // 强制先添加测试数据，看看是否能显示，排除逻辑问题
-    this.courseInfoList.push(new CourseInfo('高等数学', 1, 2, '张三', 'A101', 1, [1]))
-    this.courseInfoList.push(new CourseInfo('大学物理', 3, 4, '李四', 'B202', 1, [1]))
-    this.courseInfoList.push(new CourseInfo('线性代数', 5, 6, '王五', 'C303', 1, [1]))
-    
     let isFromInternet: boolean = false;
     try {
       if(!CourseInfoList.isFetched){
         await CourseInfoList.initKV()
         await CourseInfoList.loadFromKV()
         if(!CourseInfoList.isFetched){
-          // 只有在确定要联网获取时才去获取，避免阻塞
-          // if(await tongjiApi.getCourseInfoList()){
-          //   console.debug(`调试：从网络加载课程表完成`)
-          //   isFromInternet = true
-          // }
+          if(await tongjiApi.getCourseInfoList()){
+            console.debug(`调试：从网络加载课程表完成`)
+            isFromInternet = true
+          }
         }
       }
-      
-      // 如果获取到了真实数据，再覆盖或追加
-      if (CourseInfoList.isFetched) {
-        let weekCourse = CourseInfoList.getWeekCourseInfo(SchoolCalendarInfo.schoolWeek || 1)
-        let now = new Date();
-        let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(now.getDay(), weekCourse)
-        // 这里只是演示，实际可能需要先清空测试数据
-        // this.courseInfoList = new CourseInfoListDataSource() 
-        for(let course of todayCourse){
-          this.courseInfoList.push(course)
-        }
+
+      if(CourseInfoList.isFetched){
+        courseInfoGetStatusManager.setCompleted()
       }
-      
       if(isFromInternet){
         await CourseInfoList.storeIntoKV()
       }
     } catch (e) {
-      console.error(`加载课程数据出错: ${e}`)
+      console.error(`加载课程数据出错: ${JSON.stringify(e)}`)
     }
   }
 
@@ -121,6 +107,25 @@ struct SingleDayTimeTable{
 
   @Require courseInfoList: CourseInfoListDataSource
 
+  @State isCourseListEmpty: boolean = false
+  @State dayOfWeekOfQuery: number = new Date().getDay()
+  @State weekOfQuery: number = 1
+
+  async aboutToAppear(){
+    try {
+      await courseInfoGetStatusManager.waitForComplete()
+      this.weekOfQuery = SchoolCalendarInfo.schoolWeek || 1
+      let weekCourse = CourseInfoList.getWeekCourseInfo(this.weekOfQuery)
+      let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(this.dayOfWeekOfQuery, weekCourse)
+      for(let course of todayCourse){
+        this.courseInfoList.push(course)
+      }
+      this.isCourseListEmpty = todayCourse.length == 0
+    } catch (e){
+      console.error(`获取课程数据出错: ${JSON.stringify(e)}`)
+    }
+  }
+
   build() {
     List({ space: 12 }){
       LazyForEach(this.courseInfoList, (item: CourseInfo) => {
@@ -129,6 +134,16 @@ struct SingleDayTimeTable{
             .width('100%')
         }
       })
+      if(this.isCourseListEmpty){
+        ListItem(){
+          Text('今日没有课程')
+            .fontSize(20)
+            .fontWeight(FontWeight.Lighter)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+        }
+          .offset({top: '50%'})
+      }
     }
       .width('100%')
       .height('100%')

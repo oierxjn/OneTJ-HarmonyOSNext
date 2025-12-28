@@ -126,8 +126,8 @@ export struct BohrTwistPendulum{
         .padding({ left: 16, right: 16, top: 16, bottom: 16 })
       }
       .scrollBar(BarState.Off)
-      .width('100%')
-      .height('100%')
+      .width('100%').height('100%')
+      .align(Alignment.Top)
     }
     .backgroundColor('#F1F3F5')
     .title('波尔扭摆实验')
