@@ -1,6 +1,32 @@
 {
   "app": {
     "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/Documents/电子签名/一统同济.p12",
+          "storePassword": "00000019999B83D11CE7EAB59BBE39D4F20B4F862EAD9066330A537E256D24E3E5C1F7C77D84B0B5C3",
+          "keyAlias": "OneTJ",
+          "keyPassword": "0000001930EC417F983F4CF3A2A06358EC6B4862E79E0E172947A01757513CA1BD98BD6B7D5B7B8794",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/Documents/电子签名/一统同济Release.p7b",
+          "certpath": "D:/Documents/电子签名/一统同济CSR.cer"
+        }
+      },
+      {
+        "name": "publish",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "D:/Documents/电子签名/一统同济CSR.cer",
+          "keyAlias": "OneTJ",
+          "keyPassword": "00000019FCAF089E9174BC501A757BF28F40EDB22A55C5A8FA8EC81A1974E9B6A0CD2AB12088F89460",
+          "profile": "D:/Documents/电子签名/一统同济Release.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "D:/Documents/电子签名/一统同济.p12",
+          "storePassword": "00000019CE00E74C8C820C06ABAA4FBC9360A30D25F86768FB22FF33874123348CA23F353EB02BFECA"
+        }
+      }
     ],
     "products": [
       {
