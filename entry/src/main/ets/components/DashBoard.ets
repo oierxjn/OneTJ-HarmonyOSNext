@@ -5,7 +5,6 @@ import { webview } from "@kit.ArkWeb"
 import { loginWebviewTag } from "../pages/LoginOAuthWebView"
 import { PageName } from "../pages/Login"
 
-// TODO 主要功能
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
   [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: (navPathStack) => {
     navPathStack.pushPath({name: PageName.StudentTimeTablePage})
@@ -63,21 +62,29 @@ export struct DashBoard {
         GridItem(){
           Column(){
             Image(item.icon)
-              .width('70%')
+              .width(40)
+              .height(40)
+              .objectFit(ImageFit.Contain)
               .draggable(false)
             Text(item.name)
-              .fontSize(20)
-              .height('20%')
+              .fontSize(14)
+              .fontColor('#333333')
+              .margin({ top: 8 })
           }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
           .onClick(() => {
             HomeFunctionMap[item.uid](this.navPathStack, this.getUIContext())
           })
         }
         .clickEffect({ level: ClickEffectLevel.LIGHT })
-        .height('50%')
       })
     }
     .columnsTemplate('1fr 1fr 1fr')
-    .columnsGap('5%')
+    .rowsTemplate('1fr 1fr')
+    .rowsGap(12)
+    .columnsGap(12)
+    .padding(12)
   }
 }

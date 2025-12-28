@@ -29,7 +29,7 @@ export struct Home {
   async aboutToAppear(): Promise<void> {
     msgTextSectionAttribute.maxLines = 3
     let studentInfoTask = this.createStudentInfoTask()
-    let termInfoTask = this.createTermInfoTask() // TODO 不进行学期刷新
+    let termInfoTask = this.createTermInfoTask()
     let msgListTask = this.createMsgListTask()
 
     await Promise.all([studentInfoTask, termInfoTask, msgListTask])
@@ -66,28 +66,28 @@ export struct Home {
       // TODO BUG : 未知Bug，应当在空闲时间上报
       this.currentGrade = StudentInfo.currentGrade + '级'
     } catch (e){
-      console.error(`出现异常：${e}`)
+      console.error(`出现异常：${JSON.stringify(e)}`)
     }
     await StudentInfo.storeIntoKV()
   }
   async createTermInfoTask(): Promise<void> {
-    let update = ()=>{
-      try {
-        this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
-      } catch (e){
-        console.error(`出现异常：${JSON.stringify(e)}`)
-      }
-    }
-
     await SchoolCalendarInfo.initKV()
     await SchoolCalendarInfo.loadFromKV()
-    update()
+    if(!SchoolCalendarInfo.isFetched){
+      console.error(`错误：本地缓存学期信息读取失败`)
+    }
     if(!await tongjiApi.getSchoolCalendarInfo()){
-      console.error('获取学期信息失败')
+      console.error('错误：联网获取学期信息失败')
+    }
+    if(!SchoolCalendarInfo.isFetched){
       return
     }
-    update()
-    await SchoolCalendarInfo.storeIntoKV()
+    try {
+      this.termSimpleName = `${SchoolCalendarInfo.simpleName} 第${SchoolCalendarInfo.schoolWeek}周`
+      await SchoolCalendarInfo.storeIntoKV()
+    } catch (e){
+      console.error(`ONETJ:Home 出现异常：${e}`)
+    }
   }
 
   titleFontSize: number = 25;
@@ -95,64 +95,80 @@ export struct Home {
   build() {
     NavDestination(){
       Column(){
-        Column(){
-          Row(){
-            Image(this.avatarSrc)
-              .width('25%')
-            Blank()
-            Column(){
-              Text(this.studentNameAndId)
-                .fontSize(this.titleFontSize)
-              Blank()
-              Text(this.deptName)
-                .fontSize(this.titleFontSize)
-              Blank()
-              Text(this.currentGrade)
-                .fontSize(this.titleFontSize)
+        // Header Card
+        Column() {
+          if (!this.isInfoBoardFolded) {
+            Row() {
+              Image(this.avatarSrc)
+                .width(64)
+                .height(64)
+              
+              Column({ space: 6 }) {
+                Text(this.studentNameAndId)
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Bold)
+                Text(this.deptName)
+                  .fontSize(14)
+                  .fontColor('#666666')
+                Text(this.currentGrade)
+                  .fontSize(14)
+                  .fontColor('#666666')
+              }
+              .alignItems(HorizontalAlign.Start)
+              .margin({ left: 16 })
+              .layoutWeight(1)
             }
-            .alignItems(HorizontalAlign.Start)
-            .height('100%').width('70%')
+            .width('100%')
+            .transition({ type: TransitionType.All, opacity: 0 })
           }
-          .width('90%').height('60%')
-          .opacity(this.isInfoBoardFolded? 0 : 1)
-          .animation({})
+          
           Text(this.termSimpleName)
-            .fontSize(22)
-            .height('20%')
-            .margin({bottom: '5%', top: '5%'})
-            .animation({})
+            .fontSize(14)
+            .fontColor('#999999')
+            .margin({ top: this.isInfoBoardFolded ? 0 : 16 })
+            .width('100%')
+            .textAlign(TextAlign.Start)
         }
-        .height('30%').width('100%')
-        .translate({y: this.isInfoBoardFolded? '-80%' : 0})
-        .animation({duration: 1000})
+        .width('100%')
+        .padding(20)
+        .backgroundColor(Color.White)
+        .borderRadius(16)
+        .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
         .onClick(() => {
-          this.isInfoBoardFolded = !this.isInfoBoardFolded
+          this.getUIContext().animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
+            this.isInfoBoardFolded = !this.isInfoBoardFolded
+          })
         })
-        List(){
+        .margin({ bottom: 16 })
+
+        // Content List
+        List({ space: 12 }){
           ListItem(){
             DashBoard()
-              .width('100%').height('30%')
+              .height(200) // Give sufficient height for the grid
           }
+          .backgroundColor(Color.White)
+          .borderRadius(16)
+          .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+          
           LazyForEach(this.commonMsgList, (item: CommonMsgData, index: number) => {
             ListItem(){
-              Column(){
-                MsgInfoCard({title: item.title, time: item.publishTime, msgId: item.id}).width('100%')
-                Divider()
-                  .margin({top: '5', bottom: '5'})
-                  .visibility(Visibility.Hidden)
-              }
+              MsgInfoCard({title: item.title, time: item.publishTime, msgId: item.id})
+                .width('100%')
             }
           })
         }
-        .translate({y: this.isInfoBoardFolded? '-28%' : 0})
-        .animation({duration: 1000})
+        .layoutWeight(1)
+        .width('100%').height('auto')
+        .scrollBar(BarState.Off)
         .onAreaChange((_ ,area) => {
-          msgTextSectionAttribute.constraintWidth = Number(area.width) *0.85
+          msgTextSectionAttribute.constraintWidth = Number(area.width) * 0.85
         })
-        .height('100%').width('100%')
       }
-      .margin({top: '10%', left: '5%', right: '5%'})
-      .width('90%').height('100%')
+      .width('100%').height('100%')
+      .expandSafeArea()
+      .backgroundColor('#F1F3F5')
+      .padding({ left: 16, right: 16, top: 16 })
     }
     .hideTitleBar(true)
     .onBackPressed(() => {

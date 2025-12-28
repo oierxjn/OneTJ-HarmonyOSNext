@@ -103,7 +103,7 @@ struct Login {
       Home()
     }else if(name == PageName.LoginOAuthWebView){
       LoginOAuthWebView()
-    }else if(name == PageName.DetailMsgPage) {
+    }else if(name == PageName.DetailMsgPage){
       DetailMsg()
     }else if(name == PageName.PrivacyPolicyPage) {
       PrivacyPolicy()

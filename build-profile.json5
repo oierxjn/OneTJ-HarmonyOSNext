@@ -1,19 +1,6 @@
 {
   "app": {
     "signingConfigs": [
-      {
-        "name": "default",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "D:/Documents/电子签名/一统同济CSR.cer",
-          "keyAlias": "OneTJ",
-          "keyPassword": "00000019EFD465E7A4B486A64C17BE11ED1E10FABBC6665D55E86678828C12EC2EA7C7DE7565AD288B",
-          "profile": "D:/Documents/电子签名/一统同济Release.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "D:/Documents/电子签名/一统同济.p12",
-          "storePassword": "0000001956A64322CE5294297DE134B41FAFB049F71ED1E875145BC670C57CFBD9651DB333730C7F4D"
-        }
-      }
     ],
     "products": [
       {
@@ -32,7 +19,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"

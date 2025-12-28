@@ -26,7 +26,7 @@
     },
     {
       "name": "Version_name",
-      "value": "1.0.0 (2)"
+      "value": "1.0.0"
     },
     {
       "name": "Permission_Internet_require_reason",
@@ -35,10 +35,6 @@
     {
       "name": "Permission_Bundle_info_require",
       "value": "用于读取本应用的版本包信息"
-    },
-    {
-      "name": "Permission_Pasteboard_read",
-      "value": "用于向剪贴板写入讨论群QQ号"
     }
 
   ]}

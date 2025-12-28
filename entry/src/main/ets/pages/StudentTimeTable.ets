@@ -3,7 +3,9 @@ import { CourseInfoListDataSource } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
 import { CourseInfo, CourseInfoList, SchoolCalendarInfo } from '../models/UserModel';
 import { JSON } from '@kit.ArkTS';
-import { getRandomSingleElementFromArray } from '../components/Funcs';
+import { AsyncLock, getRandomSingleElementFromArray, TaskStatusManager } from '../components/Funcs';
+
+let courseInfoGetStatusManager: TaskStatusManager = new TaskStatusManager(`CourseInfoGetStatusManager`)
 
 @Component
 export struct StudentTimeTable {
@@ -17,24 +19,26 @@ export struct StudentTimeTable {
 
   async aboutToAppear(){
     let isFromInternet: boolean = false;
-    if(!CourseInfoList.isFetched){
-      await CourseInfoList.initKV()
-      await CourseInfoList.loadFromKV()
+    try {
       if(!CourseInfoList.isFetched){
-        if(await tongjiApi.getCourseInfoList()){
-          console.debug(`调试：从网络加载课程表完成`)
-          isFromInternet = true
+        await CourseInfoList.initKV()
+        await CourseInfoList.loadFromKV()
+        if(!CourseInfoList.isFetched){
+          if(await tongjiApi.getCourseInfoList()){
+            console.debug(`调试：从网络加载课程表完成`)
+            isFromInternet = true
+          }
         }
       }
-    }
-    let weekCourse = CourseInfoList.getWeekCourseInfo(SchoolCalendarInfo.schoolWeek!!)
-    let now = new Date();
-    let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(now.getDay(), weekCourse)
-    for(let course of todayCourse){
-      this.courseInfoList.push(course)
-    }
-    if(isFromInternet){
-      await CourseInfoList.storeIntoKV()
+
+      if(CourseInfoList.isFetched){
+        courseInfoGetStatusManager.setCompleted()
+      }
+      if(isFromInternet){
+        await CourseInfoList.storeIntoKV()
+      }
+    } catch (e) {
+      console.error(`加载课程数据出错: ${JSON.stringify(e)}`)
     }
   }
 
@@ -50,32 +54,7 @@ export struct StudentTimeTable {
             SingleDayTimeTable({courseInfoList: this.courseInfoList})
               .layoutWeight(1)
           }
-          .tabBar('每日')
-          /*
-          TabContent() {
-            // 每周视图，暂时留空
-            Column() {
-              Text('每周课表')
-                .fontSize(24)
-              Text('功能开发中...')
-            }
-            .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
-          }
-          .tabBar('每周')
-          
-          TabContent() {
-            // 每年视图，暂时留空
-            Column() {
-              Text('每年课表')
-                .fontSize(24)
-              Text('功能开发中...')
-            }
-            .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
-          }
-          .tabBar('每年')
-          */
+          .tabBar(this.TabBuilder(0, '每日'))
         }
         .layoutWeight(1)
         .barMode(BarMode.Fixed)
@@ -85,13 +64,31 @@ export struct StudentTimeTable {
       }
       .width('100%')
       .height('100%')
+      .backgroundColor('#F1F3F5') // Light gray background
     }
     .onBackPressed( () => {
       this.navPathStack.pop()
       return true
     })
-    // TODO 目前先做成今日课程
     .title('今日课程')
+    .backgroundColor('#F1F3F5')
+  }
+
+  @Builder TabBuilder(index: number, name: string) {
+    Column() {
+      Text(name)
+        .fontColor(this.currentIndex === index ? '#007DFF' : '#999999')
+        .fontSize(16)
+        .fontWeight(this.currentIndex === index ? FontWeight.Medium : FontWeight.Normal)
+        .lineHeight(22)
+        .margin({ top: 17, bottom: 7 })
+      Divider()
+        .strokeWidth(2)
+        .color('#007DFF')
+        .opacity(this.currentIndex === index ? 1 : 0)
+        .width(20)
+    }
+    .width('100%')
   }
 }
 
@@ -110,20 +107,46 @@ struct SingleDayTimeTable{
 
   @Require courseInfoList: CourseInfoListDataSource
 
+  @State isCourseListEmpty: boolean = false
+  @State dayOfWeekOfQuery: number = new Date().getDay()
+  @State weekOfQuery: number = 1
+
+  async aboutToAppear(){
+    try {
+      await courseInfoGetStatusManager.waitForComplete()
+      this.weekOfQuery = SchoolCalendarInfo.schoolWeek || 1
+      let weekCourse = CourseInfoList.getWeekCourseInfo(this.weekOfQuery)
+      let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(this.dayOfWeekOfQuery, weekCourse)
+      for(let course of todayCourse){
+        this.courseInfoList.push(course)
+      }
+      this.isCourseListEmpty = todayCourse.length == 0
+    } catch (e){
+      console.error(`获取课程数据出错: ${JSON.stringify(e)}`)
+    }
+  }
+
   build() {
-    List(){
+    List({ space: 12 }){
       LazyForEach(this.courseInfoList, (item: CourseInfo) => {
         ListItem(){
-          Column(){
-            CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
-              .width('95%').height('120')
-            Divider()
-              .margin({top: 5, bottom: 5})
-              .visibility(Visibility.Hidden)
-          }
+          CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
+            .width('100%')
         }
       })
+      if(this.isCourseListEmpty){
+        ListItem(){
+          Text('今日没有课程')
+            .fontSize(20)
+            .fontWeight(FontWeight.Lighter)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+        }
+          .offset({top: '50%'})
+      }
     }
-      .width('100%').height('100%')
+      .width('100%')
+      .height('100%')
+      .padding({ left: 16, right: 16, top: 16, bottom: 16 })
   }
 }

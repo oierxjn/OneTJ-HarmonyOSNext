@@ -15,21 +15,27 @@ export struct CommonInfoCard {
     Row() {
       Column() {
         Text(this.title)
-          .fontSize(24)
-        Text(this.description)
-          .fontSize(20)
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+        if (this.description) {
+          Text(this.description)
+            .fontSize(14)
+            .fontColor(Color.Gray)
+            .margin({ top: 4 })
+            .maxLines(2)
+            .textOverflow({overflow: TextOverflow.Ellipsis})
+        }
       }
       .alignItems(HorizontalAlign.Start)
-      .width('60%')
+      .width('100%')
     }
     .width('100%')
-    .height('100%')
-    .padding('10%')
-    .border({
-      width: 1,
-      radius: '5%',
-      color: $r('sys.color.ohos_id_color_foreground')
-    })
+    .padding(16)
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+    .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   }
 }
 
@@ -42,29 +48,40 @@ export struct CourseInfoCard {
   build() {
     Row() {
       Image(this.avatar)
-        .width('20%')
-      Divider()
-        .vertical(true)
-        .margin({left: 5, right: 5})
-        .visibility(Visibility.Hidden)
+        .width(60)
+        .height(60)
+        .objectFit(ImageFit.Contain)
+        .margin({ right: 12 })
+        
       Column() {
         Text(this.course.courseName)
-          .fontSize(24)
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+          
         Text(`地点：${this.course.room}`)
-          .fontSize(20)
+          .fontSize(14)
+          .fontColor(Color.Gray)
+          .margin({ top: 4 })
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+          
         Text(`教师：${this.course.teacher}`)
-          .fontSize(20)
+          .fontSize(14)
+          .fontColor(Color.Gray)
+          .margin({ top: 4 })
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
       }
-        .alignItems(HorizontalAlign.Start)
-        .width('60%')
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
     }
     .width('100%')
-    .height('100%')
-    .border({
-      width: 1,
-      radius: '5%',
-      color: $r('sys.color.ohos_id_color_foreground')
-    })
+    .padding(16)
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+    .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   }
 }
 
@@ -87,8 +104,7 @@ export struct MsgInfoCard {
 
   @State isFolded: boolean = true
   @State textMaxLines: number = 3
-  @State textHeight: number = minTextHeight
-
+  
   @Consume('navPathStack') navPathStack: NavPathStack
 
   build() {
@@ -96,30 +112,33 @@ export struct MsgInfoCard {
       Column(){
         Text(this.title)
           .fontSize(16)
+          .fontWeight(FontWeight.Medium)
           .maxLines(this.textMaxLines)
           .textOverflow({overflow: TextOverflow.Ellipsis})
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
+      
       Blank()
+      
       Column(){
         Text(this.time)
-          .fontSize(16)
+          .fontSize(12)
+          .fontColor(Color.Gray)
       }
       .width('100%')
       .alignItems(HorizontalAlign.End)
+      .margin({ top: 8 })
     }
     .onClick(() => {
       this.navPathStack.pushPath({name: PageName.DetailMsgPage, param: Object({id: this.msgId, title: this.title})})
     })
     .clickEffect({ level: ClickEffectLevel.HEAVY })
     .width('100%')
-    .height(this.textHeight)
-    .border({
-      width: 1,
-      radius: '5%',
-      color: $r('sys.color.ohos_id_color_foreground')
-    })
-    .padding({top: 5, bottom: 5, left: 10, right: 10})
+    .constraintSize({ minHeight: 80 })
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+    .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+    .padding(12)
   }
 }

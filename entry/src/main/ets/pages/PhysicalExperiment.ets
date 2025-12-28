@@ -24,20 +24,24 @@ export struct PhysicalExperiment {
 
   build() {
     NavDestination(){
-      Column(){
+      List({ space: 12 }){
         ForEach(this.physicalExperimentList, (item: physicalExperimentInfo, index) => {
-          CommonInfoCard({
-            title: item.title,
-            description: item.description,
-          })
-            .onClick(()=>{
-              item.onClick()
+          ListItem() {
+            CommonInfoCard({
+              title: item.title,
+              description: item.description,
             })
-            .width('100%').height(120)
+              .onClick(()=>{
+                item.onClick()
+              })
+              .width('100%')
+          }
         })
       }
-        .alignItems(HorizontalAlign.Center)
-        .width('95%').height('100%')
+      .width('100%')
+      .height('100%')
+      .padding({ left: 16, right: 16, top: 16, bottom: 16 })
     }
+    .backgroundColor('#F1F3F5')
   }
 }
