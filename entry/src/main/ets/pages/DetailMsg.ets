@@ -6,6 +6,7 @@ import { UIContext } from "@kit.ArkUI"
 import { fileIo, fileUri, picker } from "@kit.CoreFileKit"
 import { common, UIAbility } from "@kit.AbilityKit"
 import { ArkTSUtils } from "@kit.ArkTS"
+import { deviceInfo } from "@kit.BasicServicesKit"
 
 enum LoadMode{
   Fetching = 1<<0,
@@ -44,13 +45,21 @@ async function downloadHTML(htmlStr: string, uiContext: UIContext){
   abilityContext.openLink(tempUri)
 }
 
+class SetWebviewForceEnableZoom implements AttributeModifier<WebAttribute>{
+  applyNormalAttribute(instance: WebAttribute): void {
+    if(deviceInfo.sdkApiVersion >= 21){
+      instance.forceEnableZoom(true)
+    }
+  }
+}
+
+
 @Extend(Web)
 function WebStyles(){
   .domStorageAccess(true)
   .imageAccess(true)
   .overScrollMode(OverScrollMode.ALWAYS)
   .zoomAccess(true)
-  .forceEnableZoom(true)
   .javaScriptAccess(true)
   .allowWindowOpenMethod(true)
   .mixedMode(MixedMode.All)
@@ -75,6 +84,8 @@ export struct DetailMsg {
   htmlStr: string = ''
   controller: WebviewController = new webview.WebviewController(`MsgWebView`)
   tempFile: fileIo.File | undefined;
+
+  setWebviewForceEnableZoom = new SetWebviewForceEnableZoom()
 
   build() {
     NavDestination() {
@@ -120,7 +131,7 @@ export struct DetailMsg {
           Web({ src: `data:text/html, <html><body></body></html>`, controller: this.controller })
             .align(Alignment.Bottom)
             .WebStyles()
-            .onLoadFinished(() => {
+            .onPageEnd(() => {
               this.loadMode &= ~LoadMode.Rendering
               console.debug(`调试：网页加载完成`)
             })
@@ -146,6 +157,8 @@ export struct DetailMsg {
       this.loadMode &= ~LoadMode.Fetching
       this.loadMode |= LoadMode.Rendering
       this.content = content ?? '加载失败'
+      // TODO 网络内容问题
+      console.debug(`调试：网页内容\n${this.content}`)
       this.htmlStr = `<html>${this.head}<body>${this.content}</body></html>`
       try {
         this.controller.loadData(this.htmlStr, 'text/html', 'utf-8')
