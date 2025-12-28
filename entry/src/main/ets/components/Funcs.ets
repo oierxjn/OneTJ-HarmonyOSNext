@@ -5,6 +5,7 @@ import image from "@ohos.multimedia.image";
 import { ImageAnimatorModifier } from "@kit.ArkUI";
 import util from "@ohos.util";
 import { deviceInfo } from "@kit.BasicServicesKit";
+import { ArkTSUtils } from '@kit.ArkTS'
 
 export function asyncSleep(ms: number): Promise<void>{
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -158,4 +159,111 @@ function getRandomInt(min: number, max: number): number {
 function getWallpaperUrl(): string{
   let baseUrl = XJNUrlConstants.GET_PORTRAIT_WALLPAPER_URL + `/${getRandomInt(1, maxImageNumbers)}.jpg`;
   return baseUrl;
+}
+
+/**
+ * 异步互斥锁
+ */
+export class AsyncLock{
+  private locked = false;
+  // 等待队列：存储待唤醒的resolve函数
+  private waitQueue: Array<() => void> = [];
+
+  /**
+   * 获取锁
+   * @returns Promise<void> 锁获取成功后resolve
+   */
+  async lock(): Promise<void> {
+    return new Promise((resolve) => {
+      // 未锁定：直接获取锁
+      if (!this.locked) {
+        this.locked = true;
+        resolve();
+      } else {
+        // 已锁定：加入等待队列
+        this.waitQueue.push(resolve);
+      }
+    });
+  }
+
+  /**
+   * 释放锁
+   * 注意：必须确保执行（建议放在finally块）
+   */
+  unlock(): void {
+    // 队列有等待任务：唤醒第一个任务
+    if (this.waitQueue.length > 0) {
+      const nextResolve = this.waitQueue.shift();
+      nextResolve!();
+    } else {
+      // 无等待任务：释放锁
+      this.locked = false;
+    }
+  }
+
+  constructor(locked: boolean = false) {
+    this.locked = locked;
+  }
+}
+
+export class TaskStatusManager{
+  private isCompleted_: boolean = false
+  private completePromise_: Promise<void>;
+  // Promise的resolve函数（触发完成通知）
+  private resolveComplete_: () => void = () => {};
+  private rejectComplete_: (error: Object) => void = () => {}
+  // 前置任务执行失败的原因
+  private error_: Error | null = null;
+  private taskName: string
+
+  constructor(taskName: string = 'task'){
+    this.taskName = taskName
+    this.completePromise_ = new Promise<void>((resolve, reject) => {
+      this.resolveComplete_ = resolve
+      this.rejectComplete_ = reject
+    })
+  }
+
+  /**
+   * 设置任务状态为完成
+   */
+  setCompleted(){
+    if(!this.isCompleted_){
+      this.isCompleted_ = true
+      this.resolveComplete_()
+    }else {
+      console.warn(`${this.taskName}任务已经完成`)
+    }
+  }
+
+  setError(error: Object = `${this.taskName}发生错误`){
+    if(!this.isCompleted_){
+      this.isCompleted_ = true
+      this.rejectComplete_(error)
+    }else {
+      console.warn(`${this.taskName}任务已经完成`)
+    }
+  }
+
+  /**
+   * 立即获取任务完成状态
+   */
+  isCompleted(): boolean{
+    return this.isCompleted_
+  }
+
+  /**
+   * 返回等待任务完成的Promise
+   */
+  waitForComplete(): Promise<void>{
+    return this.completePromise_
+  }
+
+  reset(){
+    this.isCompleted_ = false
+    this.completePromise_ = new Promise<void>((resolve, reject) => {
+      this.resolveComplete_ = resolve
+      this.rejectComplete_ = reject
+    })
+  }
 }
