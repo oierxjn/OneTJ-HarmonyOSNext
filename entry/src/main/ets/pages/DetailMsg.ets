@@ -82,6 +82,7 @@ export struct DetailMsg {
   isWebPageVisible: boolean = false
 
   htmlStr: string = ''
+  defaultUrl: string = `data:text/html, <html><body>114514</body></html>`
   controller: WebviewController = new webview.WebviewController(`MsgWebView`)
   tempFile: fileIo.File | undefined;
 
@@ -112,8 +113,12 @@ export struct DetailMsg {
           Row({ space: 12 }){
             Button(`刷新`)
               .onClick(() => {
-                this.controller.refresh()
-                console.debug(`网页开始刷新`)
+                try {
+                  this.controller.refresh()
+                  console.debug(`调试：网页开始刷新`)
+                } catch (e){
+                  console.error(`调试刷新时出现异常：${JSON.stringify(e)}`)
+                }
               })
               .height(40)
               .layoutWeight(1)
@@ -138,9 +143,15 @@ export struct DetailMsg {
         
         List(){
           ListItem(){
-            Web({ src: `data:text/html, <html><body></body></html>`, controller: this.controller })
+            Web({ src: this.defaultUrl, controller: this.controller })
               .align(Alignment.Bottom)
               .WebStyles()
+              .onLoadIntercept((event)=>{
+                if(event.data.getRequestUrl() == this.defaultUrl){
+                  return true
+                }
+                return false
+              })
               .onPageEnd(() => {
                 this.loadMode &= ~LoadMode.Rendering
                 console.debug(`调试：网页加载完成`)
@@ -155,6 +166,7 @@ export struct DetailMsg {
                 console.error(`调试：httpError收到`)
               })
               .attributeModifier(this.setWebviewForceEnableZoom)
+              .height('100%').width('100%')
           }
           .backgroundColor(Color.White)
           .borderRadius(16)
@@ -179,11 +191,10 @@ export struct DetailMsg {
       this.loadMode &= ~LoadMode.Fetching
       this.loadMode |= LoadMode.Rendering
       this.content = content ?? '加载失败'
-      // TODO 网络内容问题
-      console.debug(`调试：网页内容\n${this.content}`)
       this.htmlStr = `<html>${this.head}<body>${this.content}</body></html>`
       try {
         this.controller.loadData(this.htmlStr, 'text/html', 'utf-8')
+        console.debug(`调试：拉取网页开始加载`)
       } catch (e) {
         console.error(`调试：加载网页失败\n${JSON.stringify(e as object)}`)
       }
