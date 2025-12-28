@@ -165,6 +165,7 @@ export struct DetailMsg {
               .onHttpErrorReceive((event) => {
                 console.error(`调试：httpError收到`)
               })
+              .initialScale(10)
               .attributeModifier(this.setWebviewForceEnableZoom)
               .height('100%').width('100%')
           }
