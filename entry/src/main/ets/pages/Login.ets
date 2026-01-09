@@ -64,15 +64,16 @@ class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
   }
 }
 
-
+AppStorage.setOrCreate('allowLogin', false)
+AppStorage.setOrCreate('loginButtonText', $r('app.string.Uni_login'))
 
 @Entry
 @Component
 struct Login {
   @State appTitle: Resource | string = $r('app.string.EntryAbility_label');
 
-  @State loginButtonText: Resource | string = $r('app.string.Uni_login');
-  @State allowLogin: boolean = false;
+  @StorageLink('loginButtonText') loginButtonText: Resource | string = $r('app.string.Uni_login');
+  @StorageLink('allowLogin') allowLogin: boolean = false;
   @State wallpaper: string | image.PixelMap = '#40942610'
   @State @Watch('onBackgroundOpacityChanged')backgroundOpacity: number = 0;
 

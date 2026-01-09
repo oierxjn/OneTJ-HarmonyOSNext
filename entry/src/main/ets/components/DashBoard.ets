@@ -25,9 +25,14 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
         let clearLoginDataTask = tongjiApi.clearLoginData()
         let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
         navPathStack.pop()
+        AppStorage.set('loginButtonText', '登录数据清理中')
+        AppStorage.set('allowLogin', true)
         await Promise.all([clearLoginDataTask, clearLoginCookie])
+        AppStorage.set('loginButtonText', $r('app.string.Uni_login'))
+        AppStorage.set('allowLogin', true)
       } catch (e){
         context?.getPromptAction().showToast({ message: '清理本地数据失败' })
+        console.error(JSON.stringify(e))
       }
     })
   },
