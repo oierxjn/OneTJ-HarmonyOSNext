@@ -43,26 +43,6 @@ export let bundleInfo: undefined | bundleManager.BundleInfo
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
-class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
-  backgroundOpacity: number = 0
-  colorTheme: Array<Array<[string, number]>> = [
-    [['#FF000000', 0.0], ['#FF000000', 1]],
-    [['#ff32d043', 0.0], ['#ffff4136', 1]]
-  ]
-
-  applyNormalAttribute(instance: TextAttribute): void {
-    if(deviceInfo.sdkApiVersion >= 20){
-      instance.shaderStyle({
-        direction: GradientDirection.Right,
-        colors: this.colorTheme[this.backgroundOpacity]
-      })
-    }
-  }
-  constructor(backgroundOpacity: number, colorTheme: Array<Array<[string, number]>>) {
-    this.backgroundOpacity = backgroundOpacity
-    this.colorTheme = colorTheme
-  }
-}
 
 AppStorage.setOrCreate('allowLogin', false)
 AppStorage.setOrCreate('loginButtonText', $r('app.string.Uni_login'))
@@ -75,24 +55,17 @@ struct Login {
   @StorageLink('loginButtonText') loginButtonText: Resource | string = $r('app.string.Uni_login');
   @StorageLink('allowLogin') allowLogin: boolean = false;
   @State wallpaper: string | image.PixelMap = '#40942610'
-  @State @Watch('onBackgroundOpacityChanged')backgroundOpacity: number = 0;
+  @State backgroundOpacity: number = 0;
 
-  @State @Watch('onColorThemeChanged')colorTheme: Array<Array<[string, number]>> = [
-    [['#FF000000', 0.0], ['#FF000000', 1]],
+  @State colorTheme: Array<Array<[ResourceStr, number]>> = [
+    [[$r('sys.color.ohos_id_color_text_primary'), 0.0], [$r('sys.color.ohos_id_color_text_primary'), 1]],
     [['#ff32d043', 0.0], ['#ffff4136', 1]]
   ]
 
-  shaderStyleModifier = new ShaderStyleModifier(this.backgroundOpacity, this.colorTheme)
-
-  onBackgroundOpacityChanged(){
-    this.shaderStyleModifier.backgroundOpacity = this.backgroundOpacity
-  }
-  onColorThemeChanged(){
-    this.shaderStyleModifier.colorTheme = this.colorTheme
-  }
-
   uiContext = this.getUIContext()
   promptAction = this.uiContext.getPromptAction()
+
+  titleTextFamily:string = 'HarmonyOS Sans SC'
 
 
   @Provide('navPathStack') navPathStack: NavPathStack = new NavPathStack()
@@ -131,6 +104,7 @@ struct Login {
       familyName: 'SanJiPoMoTi',
       familySrc: $rawfile('font/SanJiPoMoTi-2-slim.ttf')
     })
+    this.titleTextFamily = 'SanJiPoMoTi'
 
     this.loginButtonText = '自动登录中'
     this.allowLogin = false
@@ -195,18 +169,27 @@ struct Login {
         .width('100%').height('100%')
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       Navigation(this.navPathStack){
-        Column({space : '20%'}) {
-          Text(this.backgroundOpacity ? this.appTitle : this.appTitle)
-            .id('title_text')
-            .fontSize($r('app.float.page_text_font_size')).fontWeight(FontWeight.Bold)
-            .onClick(() => {
-              this.appTitle = 'Welcome';
+        Column({space : 20}) {
+          Row(){
+            Text(this.backgroundOpacity ? this.appTitle : this.appTitle)
+              .id('title_text')
+              .fontSize($r('app.float.page_text_font_size')).fontFamily(this.titleTextFamily)
+              .onClick(() => {
+                this.titleTextFamily = 'HarmonyOS Sans SC'
+                this.appTitle = '欢迎来到同济';
+              })
+              .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
+          }
+            .linearGradient({
+              direction: GradientDirection.Right,
+              colors: this.colorTheme[this.backgroundOpacity]
             })
-            .attributeModifier(this.shaderStyleModifier)
+            .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
+
 
           Column(){
             Button(this.loginButtonText)
-              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('sys.color.ohos_id_color_text_primary'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),
@@ -223,7 +206,7 @@ struct Login {
                 }
               })
             Button($r('app.string.Join_in_group'))
-              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('sys.color.ohos_id_color_text_primary'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),

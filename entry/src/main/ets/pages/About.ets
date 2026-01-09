@@ -19,28 +19,10 @@ function cardStyle(backgroundColor: ResourceColor){
   .backgroundColor(backgroundColor)
 }
 
-class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
-  colorTheme: Array<[string, number]> = [['#ff32d043', 0.0], ['#ffff4136', 1]]
-
-  applyNormalAttribute(instance: TextAttribute): void {
-    if(deviceInfo.sdkApiVersion >= 20){
-      instance.shaderStyle({
-        direction: GradientDirection.Right,
-        colors: this.colorTheme
-      })
-    }
-  }
-  constructor(colorTheme: Array<[string, number]>) {
-    this.colorTheme[0] = colorTheme[0]
-    this.colorTheme[1] = colorTheme[1]
-  }
-}
 
 @Component
 export struct About{
-  @State colorTheme: Array<[string, number]> =[['#ff32d043', 0.0], ['#ffff4136', 1]]
-
-  shaderStyleModifier = new ShaderStyleModifier(this.colorTheme)
+  @State colorTheme: Array<[string, number]> =[['#ff0631f5', 0.0], ['#ff922626', 1]]
 
   @Consume('navPathStack')navPathStack: NavPathStack
   build() {
@@ -49,11 +31,17 @@ export struct About{
         Image($r('app.media.logo'))
           .width('40%')
           .borderRadius('20%')
-        Text($r('app.string.EntryAbility_label'))
-          .fontSize(40)
-          .fontFamily('')
-          .textAlign(TextAlign.Center)
-          .attributeModifier(this.shaderStyleModifier)
+        Row(){
+          Text($r('app.string.EntryAbility_label'))
+            .fontSize(40).fontFamily('SanJiPoMoTi')
+            .textAlign(TextAlign.Center)
+            .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
+        }
+          .linearGradient({
+            direction: GradientDirection.Right,
+            colors: this.colorTheme
+          })
+          .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
         Text($r('app.string.Version_name'))
           .fontSize(25)
           .textAlign(TextAlign.Center)
