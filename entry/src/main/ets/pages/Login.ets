@@ -17,6 +17,7 @@ import { Settings } from './Settings';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { font } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -100,6 +101,7 @@ struct Login {
 
   async aboutToAppear(): Promise<void> {
     // 轻量字体设置
+    console.debug('[ONETJ] Login Begin')
     this.getUIContext().getFont().registerFont({
       familyName: 'SanJiPoMoTi',
       familySrc: $rawfile('font/SanJiPoMoTi-2-slim.ttf')
@@ -118,7 +120,9 @@ struct Login {
 
     let result = await Promise.all([this.autoLogin(), asyncSleep(AUTO_LOGIN_DELAY)])
     if(result[0]){
-      this.navPathStack.pushPath({name: PageName.HomePage})
+      setTimeout(()=>{
+        this.navPathStack.pushPath({name: PageName.HomePage})
+      })
     }else{
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
@@ -197,13 +201,15 @@ struct Login {
               })
               .backgroundColor($r('app.color.start_window_button_background'))
               .margin({bottom: "5%",top: "10%"})
-              .onClick(async () => {
-                if(!this.allowLogin)return;
-                if(TokenData.isFetched){
-                  this.navPathStack.pushPath({name: PageName.HomePage})
-                }else{
-                  this.navPathStack.pushPath({name: PageName.LoginOAuthWebView})
-                }
+              .onClick(()=>{
+                setTimeout(async () => {
+                  if (!this.allowLogin) return;
+                  if (TokenData.isFetched) {
+                    this.navPathStack.pushPath({ name: PageName.HomePage })
+                  } else {
+                    this.navPathStack.pushPath({ name: PageName.LoginOAuthWebView })
+                  }
+                })
               })
             Button($r('app.string.Join_in_group'))
               .fontSize($r('app.float.page_text_normal_size')).fontColor($r('sys.color.ohos_id_color_text_primary'))
