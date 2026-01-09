@@ -64,14 +64,14 @@ export struct StudentTimeTable {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor('#F1F3F5') // Light gray background
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background')) // Light gray background
     }
     .onBackPressed( () => {
       this.navPathStack.pop()
       return true
     })
     .title('今日课程')
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 
   @Builder TabBuilder(index: number, name: string) {

@@ -68,7 +68,6 @@ export struct DashBoard {
               .draggable(false)
             Text(item.name)
               .fontSize(14)
-              .fontColor('#333333')
               .margin({ top: 8 })
           }
           .width('100%')

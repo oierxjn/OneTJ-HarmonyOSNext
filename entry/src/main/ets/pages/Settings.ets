@@ -65,11 +65,11 @@ export struct Settings {
       }
         .width('90%').height('100%')
         .padding(24)
-        .backgroundColor(Color.White)
+        .backgroundColor($r('sys.color.ohos_id_color_background'))
         .borderRadius(16)
         .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
     }
       .title(`设置`)
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }
