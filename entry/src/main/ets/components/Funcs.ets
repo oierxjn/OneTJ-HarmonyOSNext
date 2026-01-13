@@ -269,11 +269,12 @@ export class TaskStatusManager{
 }
 
 export let dayOfWeekOfChinese: string[] = [
-  '日',
+  '何意味',
   '一',
   '二',
   '三',
   '四',
   '五',
-  '六'
+  '六',
+  '日',
 ]

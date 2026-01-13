@@ -386,6 +386,12 @@ export class CourseInfoList{
     return infoList
   }
 
+  /**
+   * 获取指定星期的课程信息
+   * @param dayOfWeek 星期几。1-7
+   * @param courseInfoArray 课程信息数组
+   * @returns 课程信息数组
+   */
   static getDayOfWeekCourseInfo(dayOfWeek: number, courseInfoArray: CourseInfo[]): CourseInfo[]{
     if(!CourseInfoList.isFetched)throw new Error('CourseInfoList 未初始化')
     let infoList: CourseInfo[] = new Array<CourseInfo>();

@@ -61,14 +61,12 @@ export class ListDataSource<T> implements IDataSource{
 
   public registerDataChangeListener(listener: DataChangeListener): void {
     if (this.listeners.indexOf(listener) < 0) {
-      console.info('add listener');
       this.listeners.push(listener);
     }
   }
   public unregisterDataChangeListener(listener: DataChangeListener): void {
     const pos = this.listeners.indexOf(listener);
     if (pos >= 0) {
-      console.info('remove listener');
       this.listeners.splice(pos, 1);
     }
   }
@@ -206,6 +204,12 @@ export class CourseInfoListDataSource extends ListDataSource<CourseInfo> {
   push(course: CourseInfo){
     this.dataList.push(course);
     this.notifyDataAdd(this.dataList.length - 1);
+  }
+  clear(){
+    for(let i=this.dataList.length-1; i>=0; i--){
+      this.dataList.pop()
+      this.notifyDataDelete(i)
+    }
   }
 }
 

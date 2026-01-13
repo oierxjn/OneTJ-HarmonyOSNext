@@ -7,6 +7,8 @@ import { AsyncLock, getRandomSingleElementFromArray, TaskStatusManager, dayOfWee
 
 let courseInfoGetStatusManager: TaskStatusManager = new TaskStatusManager(`CourseInfoGetStatusManager`)
 
+let MaxSchoolWeek: number = 21
+
 @Component
 export struct StudentTimeTable {
 
@@ -101,8 +103,13 @@ let CourseAvatar: Resource[] = [
 ]
 
 @Extend(Text)
-function textStyle(){
+function titleTextStyle(){
   .fontSize(28)
+  .textAlign(TextAlign.Center)
+}
+@Extend(Text)
+function buttonTextStyle(){
+  .fontSize(18)
   .textAlign(TextAlign.Center)
 }
 
@@ -114,6 +121,8 @@ struct SingleDayTimeTable{
   @State isCourseListEmpty: boolean = false
   @State dayOfWeekOfQuery: number = new Date().getDay()
   @State weekOfQuery: number = 1
+
+  promptAction = this.getUIContext().getPromptAction()
 
   async aboutToAppear(){
     try {
@@ -131,23 +140,39 @@ struct SingleDayTimeTable{
   }
 
   weekAdd(){
+    if(this.weekOfQuery >= MaxSchoolWeek){
+      throw new Error(`周数已超出最大值: ${MaxSchoolWeek}`)
+    }
     this.weekOfQuery += 1
   }
   weekSub(){
+    if(this.weekOfQuery <= 1){
+      throw new Error(`周数已超出最小值: 1`)
+    }
     this.weekOfQuery -= 1
   }
   dayAdd(){
     this.dayOfWeekOfQuery += 1
-    if(this.dayOfWeekOfQuery > 6){
-      this.weekAdd()
+    if(this.dayOfWeekOfQuery > 7){
+      try{
+        this.weekAdd()
+      } catch (_){
+        this.dayOfWeekOfQuery -= 1
+        throw new Error(`不能再往后了`)
+      }
       this.dayOfWeekOfQuery = 0
     }
   }
   daySub(){
     this.dayOfWeekOfQuery -= 1
-    if(this.dayOfWeekOfQuery < 0){
-      this.weekSub()
-      this.dayOfWeekOfQuery = 6
+    if(this.dayOfWeekOfQuery < 1){
+      try{
+        this.weekSub()
+      } catch (_){
+        this.dayOfWeekOfQuery += 1
+        throw new Error(`不能再往前了`)
+      }
+      this.dayOfWeekOfQuery = 7
     }
   }
 
@@ -155,7 +180,7 @@ struct SingleDayTimeTable{
     try{
       let weekCourse = CourseInfoList.getWeekCourseInfo(this.weekOfQuery)
       let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(this.dayOfWeekOfQuery, weekCourse)
-      this.courseInfoList = new CourseInfoListDataSource()
+      this.courseInfoList.clear()
       for(let course of todayCourse){
         this.courseInfoList.push(course)
       }
@@ -165,34 +190,65 @@ struct SingleDayTimeTable{
   }
 
   build() {
-    List({ space: 12 }){
-      ListItem(){
-        Row() {
-          Text(`第${SchoolCalendarInfo.schoolWeek}周`)
-            .textStyle().width('50%')
-          Text(`星期${dayOfWeekOfChinese[this.dayOfWeekOfQuery]}`)
-            .textStyle().width('50%')
+    Column(){
+      Row() {
+        Text(`第${this.weekOfQuery}周`)
+          .titleTextStyle().width('50%')
+        Text(`星期${dayOfWeekOfChinese[this.dayOfWeekOfQuery]}`)
+          .titleTextStyle().width('50%')
+      }
+      List({ space: 12 }){
+        LazyForEach(this.courseInfoList, (item: CourseInfo) => {
+          ListItem(){
+            CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
+              .width('100%')
+          }
+        })
+        if(this.isCourseListEmpty){
+          ListItem(){
+            Text('今日没有课程')
+              .fontSize(20)
+              .fontWeight(FontWeight.Lighter)
+              .width('100%')
+              .textAlign(TextAlign.Center)
+          }
+            .offset({top: '50%'})
         }
       }
-      LazyForEach(this.courseInfoList, (item: CourseInfo) => {
-        ListItem(){
-          CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
-            .width('100%')
+        .width('100%').layoutWeight(1)
+        .padding({ left: 16, right: 16, top: 16, bottom: 16 })
+      Row() {
+        Button() {
+          Text('上一天')
+            .titleTextStyle()
         }
-      })
-      if(this.isCourseListEmpty){
-        ListItem(){
-          Text('今日没有课程')
-            .fontSize(20)
-            .fontWeight(FontWeight.Lighter)
-            .width('100%')
-            .textAlign(TextAlign.Center)
+          .onClick(() => {
+            try {
+              this.daySub()
+            } catch (e){
+              this.promptAction.showToast({message :(e as Error).message})
+            }
+            this.update()
+          })
+          .margin({ left: 16, right: 16 })
+          .width('30%')
+        Button() {
+          Text('下一天')
+            .titleTextStyle()
         }
-          .offset({top: '50%'})
+          .onClick(() => {
+            try {
+              this.dayAdd()
+            } catch (e){
+              this.promptAction.showToast({message :(e as Error).message})
+            }
+            this.update()
+          })
+          .margin({ left: 16, right: 16 })
+          .width('30%')
       }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceAround)
     }
-      .width('100%')
-      .height('100%')
-      .padding({ left: 16, right: 16, top: 16, bottom: 16 })
   }
 }
