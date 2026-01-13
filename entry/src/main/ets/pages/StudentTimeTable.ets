@@ -112,6 +112,14 @@ function buttonTextStyle(){
   .fontSize(18)
   .textAlign(TextAlign.Center)
 }
+@Extend(Button)
+function buttonCardStyle(){
+  .fontColor($r('sys.color.ohos_id_color_emphasize'))
+  .backgroundColor($r('sys.color.ohos_id_color_background'))
+  .borderRadius(10)
+  .padding(10)
+  .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+}
 
 @Component
 struct SingleDayTimeTable{
@@ -127,13 +135,8 @@ struct SingleDayTimeTable{
   async aboutToAppear(){
     try {
       await courseInfoGetStatusManager.waitForComplete()
-      this.weekOfQuery = SchoolCalendarInfo.schoolWeek || 1
-      let weekCourse = CourseInfoList.getWeekCourseInfo(this.weekOfQuery)
-      let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(this.dayOfWeekOfQuery, weekCourse)
-      for(let course of todayCourse){
-        this.courseInfoList.push(course)
-      }
-      this.isCourseListEmpty = todayCourse.length == 0
+      this.setToday()
+      this.update()
     } catch (e){
       console.error(`获取课程数据出错: ${JSON.stringify(e)}`)
     }
@@ -175,6 +178,10 @@ struct SingleDayTimeTable{
       this.dayOfWeekOfQuery = 7
     }
   }
+  setToday(){
+    this.dayOfWeekOfQuery = new Date().getDay()
+    this.weekOfQuery = SchoolCalendarInfo.schoolWeek || 1
+  }
 
   update(){
     try{
@@ -184,6 +191,7 @@ struct SingleDayTimeTable{
       for(let course of todayCourse){
         this.courseInfoList.push(course)
       }
+      this.isCourseListEmpty = todayCourse.length == 0
     } catch (error){
       console.error(`更新课程数据出错: ${JSON.stringify(error)}`)
     }
@@ -220,7 +228,7 @@ struct SingleDayTimeTable{
       Row() {
         Button() {
           Text('上一天')
-            .titleTextStyle()
+            .buttonTextStyle()
         }
           .onClick(() => {
             try {
@@ -230,11 +238,21 @@ struct SingleDayTimeTable{
             }
             this.update()
           })
-          .margin({ left: 16, right: 16 })
+          .buttonCardStyle()
+          .width('30%')
+        Button(){
+          Text(`今天`)
+            .buttonTextStyle()
+        }
+          .onClick(() => {
+            this.setToday()
+            this.update()
+          })
+          .buttonCardStyle()
           .width('30%')
         Button() {
           Text('下一天')
-            .titleTextStyle()
+            .buttonTextStyle()
         }
           .onClick(() => {
             try {
@@ -244,7 +262,7 @@ struct SingleDayTimeTable{
             }
             this.update()
           })
-          .margin({ left: 16, right: 16 })
+          .buttonCardStyle()
           .width('30%')
       }
         .width('100%')
