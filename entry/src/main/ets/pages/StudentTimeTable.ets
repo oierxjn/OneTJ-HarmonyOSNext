@@ -3,7 +3,7 @@ import { CourseInfoListDataSource } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
 import { CourseInfo, CourseInfoList, SchoolCalendarInfo } from '../models/UserModel';
 import { JSON } from '@kit.ArkTS';
-import { AsyncLock, getRandomSingleElementFromArray, TaskStatusManager } from '../components/Funcs';
+import { AsyncLock, getRandomSingleElementFromArray, TaskStatusManager, dayOfWeekOfChinese } from '../components/Funcs';
 
 let courseInfoGetStatusManager: TaskStatusManager = new TaskStatusManager(`CourseInfoGetStatusManager`)
 
@@ -64,7 +64,7 @@ export struct StudentTimeTable {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor($r('sys.color.ohos_id_color_sub_background')) // Light gray background
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     }
     .onBackPressed( () => {
       this.navPathStack.pop()
@@ -77,7 +77,7 @@ export struct StudentTimeTable {
   @Builder TabBuilder(index: number, name: string) {
     Column() {
       Text(name)
-        .fontColor(this.currentIndex === index ? '#007DFF' : '#999999')
+        .fontColor(this.currentIndex === index ? $r('sys.color.ohos_id_color_emphasize') : '#999999')
         .fontSize(16)
         .fontWeight(this.currentIndex === index ? FontWeight.Medium : FontWeight.Normal)
         .lineHeight(22)
@@ -100,7 +100,11 @@ let CourseAvatar: Resource[] = [
   $rawfile('fluentemoji-png/bread_3d.png')
 ]
 
-
+@Extend(Text)
+function textStyle(){
+  .fontSize(28)
+  .textAlign(TextAlign.Center)
+}
 
 @Component
 struct SingleDayTimeTable{
@@ -126,8 +130,50 @@ struct SingleDayTimeTable{
     }
   }
 
+  weekAdd(){
+    this.weekOfQuery += 1
+  }
+  weekSub(){
+    this.weekOfQuery -= 1
+  }
+  dayAdd(){
+    this.dayOfWeekOfQuery += 1
+    if(this.dayOfWeekOfQuery > 6){
+      this.weekAdd()
+      this.dayOfWeekOfQuery = 0
+    }
+  }
+  daySub(){
+    this.dayOfWeekOfQuery -= 1
+    if(this.dayOfWeekOfQuery < 0){
+      this.weekSub()
+      this.dayOfWeekOfQuery = 6
+    }
+  }
+
+  update(){
+    try{
+      let weekCourse = CourseInfoList.getWeekCourseInfo(this.weekOfQuery)
+      let todayCourse = CourseInfoList.getDayOfWeekCourseInfo(this.dayOfWeekOfQuery, weekCourse)
+      this.courseInfoList = new CourseInfoListDataSource()
+      for(let course of todayCourse){
+        this.courseInfoList.push(course)
+      }
+    } catch (error){
+      console.error(`更新课程数据出错: ${JSON.stringify(error)}`)
+    }
+  }
+
   build() {
     List({ space: 12 }){
+      ListItem(){
+        Row() {
+          Text(`第${SchoolCalendarInfo.schoolWeek}周`)
+            .textStyle().width('50%')
+          Text(`星期${dayOfWeekOfChinese[this.dayOfWeekOfQuery]}`)
+            .textStyle().width('50%')
+        }
+      }
       LazyForEach(this.courseInfoList, (item: CourseInfo) => {
         ListItem(){
           CourseInfoCard({course: item, avatar: getRandomSingleElementFromArray(CourseAvatar)})
