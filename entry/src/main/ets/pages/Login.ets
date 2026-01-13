@@ -101,7 +101,6 @@ struct Login {
 
   async aboutToAppear(): Promise<void> {
     // 轻量字体设置
-    console.debug('[ONETJ] Login Begin')
     this.getUIContext().getFont().registerFont({
       familyName: 'SanJiPoMoTi',
       familySrc: $rawfile('font/SanJiPoMoTi-2-slim.ttf')
