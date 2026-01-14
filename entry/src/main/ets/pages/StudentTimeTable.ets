@@ -72,7 +72,7 @@ export struct StudentTimeTable {
       this.navPathStack.pop()
       return true
     })
-    .title('今日课程')
+    .title('单日课程')
     .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 
@@ -163,7 +163,7 @@ struct SingleDayTimeTable{
         this.dayOfWeekOfQuery -= 1
         throw new Error(`不能再往后了`)
       }
-      this.dayOfWeekOfQuery = 0
+      this.dayOfWeekOfQuery = 1
     }
   }
   daySub(){

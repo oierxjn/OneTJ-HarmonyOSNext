@@ -52,7 +52,7 @@ export struct DashBoard {
 
   HomeFuncList: HomeFunctionItem[] = new Array<HomeFunctionItem>()
   async aboutToAppear() {
-    this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY, '今日课程', $rawfile('fluentemoji-png/alarm_clock_3d.png')))
+    this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY, '单日课程', $rawfile('fluentemoji-png/alarm_clock_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.EXP_CALC, '实验计算', $rawfile('fluentemoji-png/microscope_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.LOGOUT, '退出登录', $rawfile('fluentemoji-png/wilted_flower_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.JOIN_QQ_GROUP, '加讨论群', $rawfile('fluentemoji-png/zany_face_3d.png')))
