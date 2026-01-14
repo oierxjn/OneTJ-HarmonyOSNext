@@ -493,7 +493,9 @@ export class UserPreference{
 
       let agreePolicy = await agreePolicyTask as boolean
 
-      UserPreference.agreePolicy = agreePolicy!!
+      UserPreference.storeUserPreference(
+        agreePolicy!!
+      )
     } catch (e){
       console.error(`加载用户设置时发生错误：${JSON.stringify(e)}`)
     }
@@ -510,7 +512,7 @@ export class UserPreference{
 
   static async initKV() {
     try {
-      UserPreference.KVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>(UserPreference.agreePolicyKey, KVConfig)
+      UserPreference.KVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>(UserPreference.userPreferenceKey, KVConfig)
     } catch (e) {
       console.error(`初始化 UserPreference 数据库时发生错误：${JSON.stringify(e)}`)
     }
