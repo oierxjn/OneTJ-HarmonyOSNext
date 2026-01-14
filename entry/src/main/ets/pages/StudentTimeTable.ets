@@ -127,7 +127,7 @@ struct SingleDayTimeTable{
   @Require courseInfoList: CourseInfoListDataSource
 
   @State isCourseListEmpty: boolean = false
-  @State dayOfWeekOfQuery: number = new Date().getDay()
+  @State dayOfWeekOfQuery: number = 0
   @State weekOfQuery: number = 1
 
   promptAction = this.getUIContext().getPromptAction()
@@ -179,7 +179,8 @@ struct SingleDayTimeTable{
     }
   }
   setToday(){
-    this.dayOfWeekOfQuery = new Date().getDay()
+    let day = new Date().getDay()
+    this.dayOfWeekOfQuery = day == 0 ? 7 : day
     this.weekOfQuery = SchoolCalendarInfo.schoolWeek || 1
   }
 
