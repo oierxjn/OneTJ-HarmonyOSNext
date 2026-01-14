@@ -460,3 +460,59 @@ export class MsgList{
   static updateTime: number = 0;
   static isFetched: boolean = false;
 }
+
+export class UserPreference{
+  static agreePolicy: boolean = false;
+  static isFetched: boolean = false;
+
+  static userPreferenceKey: string = 'userPreferenceKey';
+  static agreePolicyKey: string = 'agreePolicyKey';
+  static KVStore: distributedKVStore.SingleKVStore | undefined;
+
+  static storeUserPreference(agreePolicy: boolean){
+    UserPreference.agreePolicy = agreePolicy
+    UserPreference.isFetched = true
+  }
+
+  static async resetAgreePolicy(agreePolicy: boolean){
+    UserPreference.agreePolicy = agreePolicy
+    await UserPreference.storeIntoKV()
+  }
+
+  static async storeIntoKV(){
+    try {
+      let agreePolicyTask = UserPreference.KVStore!!.put(UserPreference.agreePolicyKey, UserPreference.agreePolicy)
+      await Promise.all([agreePolicyTask])
+    } catch (e){
+      console.error(`存储用户设置时发生错误：${JSON.stringify(e)}`)
+    }
+  }
+  static async loadFromKV(){
+    try {
+      let agreePolicyTask = UserPreference.KVStore!!.get(UserPreference.agreePolicyKey)
+
+      let agreePolicy = await agreePolicyTask as boolean
+
+      UserPreference.agreePolicy = agreePolicy!!
+    } catch (e){
+      console.error(`加载用户设置时发生错误：${JSON.stringify(e)}`)
+    }
+  }
+  static async clearFromKV(){
+    try {
+      let agreePolicyTask = UserPreference.KVStore!!.delete(UserPreference.agreePolicyKey)
+
+      await Promise.all([agreePolicyTask])
+    } catch (e){
+      console.error(`清除 UserPreference 数据库时发生错误：${JSON.stringify(e)}`)
+    }
+  }
+
+  static async initKV() {
+    try {
+      UserPreference.KVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>(UserPreference.agreePolicyKey, KVConfig)
+    } catch (e) {
+      console.error(`初始化 UserPreference 数据库时发生错误：${JSON.stringify(e)}`)
+    }
+  }
+}

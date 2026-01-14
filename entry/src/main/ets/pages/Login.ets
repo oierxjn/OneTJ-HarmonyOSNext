@@ -1,7 +1,7 @@
 import { asyncSleep, fetchNewWallpaper, wallpaperPixelMap } from '../components/Funcs';
 import { initKVManager } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
-import { OAuthCode, TokenData } from '../models/UserModel';
+import { OAuthCode, TokenData, UserPreference } from '../models/UserModel';
 import { DetailMsg } from './DetailMsg';
 import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
@@ -18,6 +18,7 @@ import { PrivacyPolicy } from './PrivacyPolicy';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { font } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { JSON } from '@kit.ArkTS';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -44,7 +45,7 @@ export let bundleInfo: undefined | bundleManager.BundleInfo
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
-
+AppStorage.setOrCreate('agreePolicy', false)
 AppStorage.setOrCreate('allowLogin', false)
 AppStorage.setOrCreate('loginButtonText', $r('app.string.Uni_login'))
 
@@ -55,6 +56,7 @@ struct Login {
 
   @StorageLink('loginButtonText') loginButtonText: Resource | string = $r('app.string.Uni_login');
   @StorageLink('allowLogin') allowLogin: boolean = false;
+  @StorageLink('agreePolicy') agreePolicy: boolean = false;
   @State wallpaper: string | image.PixelMap = '#40942610'
   @State backgroundOpacity: number = 0;
 
@@ -116,7 +118,7 @@ struct Login {
       console.error('KVManager初始化失败')
       return
     }
-
+    await this.loadUserPreference()
     let result = await Promise.all([this.autoLogin(), asyncSleep(AUTO_LOGIN_DELAY)])
     if(result[0]){
       setTimeout(()=>{
@@ -127,6 +129,14 @@ struct Login {
       this.allowLogin = true
     }
     Promise.all([wallpaperTask, bundleInfoTask])
+  }
+
+  async loadUserPreference(){
+    await UserPreference.initKV()
+    await UserPreference.loadFromKV()
+    if(UserPreference.isFetched){
+      this.agreePolicy = UserPreference.agreePolicy
+    }
   }
 
   async getBundleInfo(){
@@ -203,11 +213,21 @@ struct Login {
               .onClick(()=>{
                 setTimeout(async () => {
                   if (!this.allowLogin) return;
+                  if (!this.agreePolicy){
+                    try {
+                      this.promptAction.showToast({message: `请先阅读并同意隐私政策`})
+                    } catch (e){
+                      console.error(JSON.stringify(e))
+                    }
+                    return
+                  }
+                  UserPreference.storeUserPreference(this.agreePolicy)
                   if (TokenData.isFetched) {
                     this.navPathStack.pushPath({ name: PageName.HomePage })
                   } else {
                     this.navPathStack.pushPath({ name: PageName.LoginOAuthWebView })
                   }
+                  await UserPreference.storeIntoKV()
                 })
               })
             Button($r('app.string.Join_in_group'))
@@ -222,14 +242,20 @@ struct Login {
               .onClick(()=>{
                 this.navPathStack.pushPath({name: PageName.JoinGroupPage})
               })
-            Text(`登录本应用则视为已同意`)
-              .textAlign(TextAlign.Center)
-            Text(`『一统同济用户隐私政策』`)
-              .fontColor(Color.Blue)
-              .onClick(()=>{
-                this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
-              })
-              .textAlign(TextAlign.Center)
+            Row(){
+              Checkbox()
+                .select($$this.agreePolicy)
+              Column(){
+                Text(`已阅读并同意`)
+                  .textAlign(TextAlign.Center)
+                Text(`『一统同济用户隐私政策』`)
+                  .fontColor($r('sys.color.ohos_id_color_emphasize'))
+                  .onClick(()=>{
+                    this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
+                  })
+                  .textAlign(TextAlign.Center)
+              }
+            }
           }
           .borderRadius('10%')
           .backgroundBlurStyle(BlurStyle.Thin)

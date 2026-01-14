@@ -4,6 +4,7 @@ import { tongjiApi } from "../models/TongjiApi"
 import { webview } from "@kit.ArkWeb"
 import { loginWebviewTag } from "../pages/LoginOAuthWebView"
 import { PageName } from "../pages/Login"
+import { UserPreference } from "../models/UserModel"
 
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
   [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: (navPathStack) => {
@@ -24,10 +25,12 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
       try {
         let clearLoginDataTask = tongjiApi.clearLoginData()
         let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
+        let setAgreePolicyTask = UserPreference.resetAgreePolicy(false)
         navPathStack.pop()
         AppStorage.set('loginButtonText', '登录数据清理中')
         AppStorage.set('allowLogin', true)
-        await Promise.all([clearLoginDataTask, clearLoginCookie])
+        AppStorage.set('agreePolicy', false)
+        await Promise.all([clearLoginDataTask, clearLoginCookie, setAgreePolicyTask])
         AppStorage.set('loginButtonText', $r('app.string.Uni_login'))
         AppStorage.set('allowLogin', true)
       } catch (e){
