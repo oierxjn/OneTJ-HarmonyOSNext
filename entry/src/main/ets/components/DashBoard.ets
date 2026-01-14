@@ -4,6 +4,7 @@ import { tongjiApi } from "../models/TongjiApi"
 import { webview } from "@kit.ArkWeb"
 import { loginWebviewTag } from "../pages/LoginOAuthWebView"
 import { PageName } from "../pages/Login"
+import { UserPreference } from "../models/UserModel"
 
 let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?: UIContext) => void> = {
   [HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY]: (navPathStack) => {
@@ -24,10 +25,17 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
       try {
         let clearLoginDataTask = tongjiApi.clearLoginData()
         let clearLoginCookie = webview.WebCookieManager.clearAllCookies()
+        let setAgreePolicyTask = UserPreference.resetAgreePolicy(false)
         navPathStack.pop()
-        await Promise.all([clearLoginDataTask, clearLoginCookie])
+        AppStorage.set('loginButtonText', '登录数据清理中')
+        AppStorage.set('allowLogin', true)
+        AppStorage.set('agreePolicy', false)
+        await Promise.all([clearLoginDataTask, clearLoginCookie, setAgreePolicyTask])
+        AppStorage.set('loginButtonText', $r('app.string.Uni_login'))
+        AppStorage.set('allowLogin', true)
       } catch (e){
         context?.getPromptAction().showToast({ message: '清理本地数据失败' })
+        console.error(JSON.stringify(e))
       }
     })
   },
@@ -47,7 +55,7 @@ export struct DashBoard {
 
   HomeFuncList: HomeFunctionItem[] = new Array<HomeFunctionItem>()
   async aboutToAppear() {
-    this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY, '今日课程', $rawfile('fluentemoji-png/alarm_clock_3d.png')))
+    this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY, '单日课程', $rawfile('fluentemoji-png/alarm_clock_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.EXP_CALC, '实验计算', $rawfile('fluentemoji-png/microscope_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.LOGOUT, '退出登录', $rawfile('fluentemoji-png/wilted_flower_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.JOIN_QQ_GROUP, '加讨论群', $rawfile('fluentemoji-png/zany_face_3d.png')))
@@ -68,7 +76,6 @@ export struct DashBoard {
               .draggable(false)
             Text(item.name)
               .fontSize(14)
-              .fontColor('#333333')
               .margin({ top: 8 })
           }
           .width('100%')

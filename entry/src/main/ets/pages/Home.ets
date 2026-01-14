@@ -131,7 +131,7 @@ export struct Home {
         }
         .width('100%')
         .padding(20)
-        .backgroundColor(Color.White)
+        .backgroundColor($r('sys.color.ohos_id_color_background'))
         .borderRadius(16)
         .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
         .onClick(() => {
@@ -147,7 +147,7 @@ export struct Home {
             DashBoard()
               .height(200) // Give sufficient height for the grid
           }
-          .backgroundColor(Color.White)
+          .backgroundColor($r('sys.color.ohos_id_color_background'))
           .borderRadius(16)
           .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
           
@@ -167,7 +167,7 @@ export struct Home {
       }
       .width('100%').height('100%')
       .expandSafeArea()
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
       .padding({ left: 16, right: 16, top: 16 })
     }
     .hideTitleBar(true)

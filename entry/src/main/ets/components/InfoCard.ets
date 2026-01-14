@@ -33,7 +33,7 @@ export struct CommonInfoCard {
     }
     .width('100%')
     .padding(16)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
     .borderRadius(16)
     .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   }
@@ -79,7 +79,7 @@ export struct CourseInfoCard {
     }
     .width('100%')
     .padding(16)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
     .borderRadius(16)
     .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   }
@@ -136,7 +136,7 @@ export struct MsgInfoCard {
     .clickEffect({ level: ClickEffectLevel.HEAVY })
     .width('100%')
     .constraintSize({ minHeight: 80 })
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
     .borderRadius(16)
     .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
     .padding(12)

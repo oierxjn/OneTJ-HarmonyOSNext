@@ -18,32 +18,46 @@ let isTempHtmlDownLoaded: boolean = false;
 let buttonBackgroundColor = $r('sys.color.ohos_id_color_floating_button_shadow_start')
 let normalTextColor = $r('sys.color.ohos_id_color_text_primary')
 
-async function downloadHTML(htmlStr: string, uiContext: UIContext){
+async function loadDownloadedHTML(htmlStr: string, uiContext: UIContext, controller: webview.WebviewController, tempFile: fileIo.File| undefined){
   let tempDir = uiContext.getHostContext()?.tempDir
-  let tempFileDir: string = tempDir + '/temp.html'
-  let tempFile: fileIo.File | undefined;
-  if(!isTempHtmlDownLoaded){
+  let tempFileDir: string = tempDir?.endsWith('/')
+    ? tempDir +'temp.html'
+    : tempDir + '/temp.html';
+  if(tempFile == undefined){
     try {
       tempFile = await fileIo.open(
         tempFileDir,
         fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC
       )
       let writeLength = await fileIo.write(tempFile.fd, htmlStr)
+      isTempHtmlDownLoaded = true
       console.debug(`写入完成，写入长度：${writeLength}`)
     } catch (e){
-      console.error(`下载时出现异常：${JSON.stringify(e)}`)
+      console.error(`下载时出现异常：${e}`)
     } finally {
       if(tempFile){
         await fileIo.close(tempFile)
         console.debug(`文件流正常关闭`)
       }
     }
-    isTempHtmlDownLoaded = true
   }
-  let tempUri = fileUri.getUriFromPath(tempFileDir)
-  let abilityContext = uiContext.getHostContext() as common.UIAbilityContext
-  abilityContext.openLink(tempUri)
+  try {
+    controller.loadUrl(`file://${tempFileDir}`)
+    uiContext.getPromptAction().showToast({message: `网页加载完成`})
+  } catch (error) {
+    uiContext.getPromptAction().showToast({message: `网页加载失败: ${JSON.stringify(error)}`})
+  }
 }
+function openBrowserLink(uiContext: UIContext){
+  let tempDir = uiContext.getHostContext()?.tempDir
+  let tempFileDir: string = tempDir?.endsWith('/')
+    ? tempDir +'temp.html'
+    : tempDir + '/temp.html';
+  let uri = fileUri.getUriFromPath(tempFileDir)
+  let abilityContext = uiContext.getHostContext() as common.UIAbilityContext
+  abilityContext.openLink(uri)
+}
+
 
 class SetWebviewForceEnableZoom implements AttributeModifier<WebAttribute>{
   applyNormalAttribute(instance: WebAttribute): void {
@@ -65,6 +79,7 @@ function WebStyles(){
   .mixedMode(MixedMode.All)
   .darkMode(WebDarkMode.Auto)
   .forceDarkAccess(true)
+  .fileAccess(true)
 }
 
 @Component
@@ -86,6 +101,7 @@ export struct DetailMsg {
   controller: WebviewController = new webview.WebviewController(`MsgWebView`)
   tempFile: fileIo.File | undefined;
 
+  // API 21
   setWebviewForceEnableZoom = new SetWebviewForceEnableZoom()
 
   build() {
@@ -115,32 +131,31 @@ export struct DetailMsg {
               .onClick(() => {
                 try {
                   this.controller.refresh()
-                  console.debug(`调试：网页开始刷新`)
                 } catch (e){
-                  console.error(`调试刷新时出现异常：${JSON.stringify(e)}`)
+                  console.error(`[ONETJ]刷新时出现异常：${JSON.stringify(e)}`)
                 }
               })
               .height(40)
               .layoutWeight(1)
               .fontColor('#007DFF')
-              .backgroundColor(Color.White)
+              .backgroundColor($r('sys.color.ohos_id_color_background'))
               .borderRadius(20)
               .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
             Button(`用其他应用打开`)
               .onClick(async () => {
-                await downloadHTML(this.htmlStr, this.getUIContext())
+                openBrowserLink(this.getUIContext())
               })
               .height(40)
               .layoutWeight(1)
               .fontColor('#007DFF')
-              .backgroundColor(Color.White)
+              .backgroundColor($r('sys.color.ohos_id_color_background'))
               .borderRadius(20)
               .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
           }
           .width('100%')
           .padding({ left: 16, right: 16, top: 12, bottom: 12 })
         }
-
+        
         List(){
           ListItem(){
             Web({ src: this.defaultUrl, controller: this.controller })
@@ -165,10 +180,11 @@ export struct DetailMsg {
               .onHttpErrorReceive((event) => {
                 console.error(`调试：httpError收到`)
               })
+              .initialScale(10)
               .attributeModifier(this.setWebviewForceEnableZoom)
               .height('100%').width('100%')
           }
-          .backgroundColor(Color.White)
+          .backgroundColor($r('sys.color.ohos_id_color_background'))
           .borderRadius(16)
           .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
           .padding(12)
@@ -179,10 +195,10 @@ export struct DetailMsg {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     }
     .title(this.pageTitle)
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     .onReady(async (context) => {
       let param = context.pathInfo.param as CommonMsgToDetailMsgNavParams
       this.pageTitle = param.title
@@ -192,11 +208,7 @@ export struct DetailMsg {
       this.loadMode |= LoadMode.Rendering
       this.content = content ?? '加载失败'
       this.htmlStr = `<html>${this.head}<body>${this.content}</body></html>`
-      try {
-        this.controller.loadData(this.htmlStr, 'text/html', 'utf-8')
-      } catch (e) {
-        console.error(`调试：加载网页失败\n${JSON.stringify(e as object)}`)
-      }
+      loadDownloadedHTML(this.htmlStr, this.getUIContext(), this.controller, this.tempFile)
     })
     .onBackPressed(() => {
       try {

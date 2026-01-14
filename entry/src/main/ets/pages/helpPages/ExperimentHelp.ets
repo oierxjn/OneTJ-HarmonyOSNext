@@ -39,7 +39,7 @@ function italicTextStyle(fontSize: string | number | Resource = 14){
 
 @Extend(Column)
 function cardStyle(){
-  .backgroundColor(Color.White)
+  .backgroundColor($r('sys.color.ohos_id_color_background'))
   .borderRadius(16)
   .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   .padding(16)
@@ -93,6 +93,6 @@ export struct ExperimentHelp{
         .align(Alignment.Top)
     }
       .title(`帮助：物理实验`)
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }

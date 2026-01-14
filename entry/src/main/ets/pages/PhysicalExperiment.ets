@@ -42,6 +42,6 @@ export struct PhysicalExperiment {
       .height('100%')
       .padding({ left: 16, right: 16, top: 16, bottom: 16 })
     }
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }

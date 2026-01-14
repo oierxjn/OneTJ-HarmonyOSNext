@@ -15,6 +15,14 @@ function cardStyle(backgroundColor: ResourceColor){
   .padding(10)
   .backgroundColor(backgroundColor)
 }
+@Extend(Button)
+function buttonCardStyle(){
+  .fontColor($r('sys.color.ohos_id_color_emphasize'))
+  .backgroundColor($r('sys.color.ohos_id_color_background'))
+  .borderRadius(10)
+  .padding(10)
+  .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+}
 
 @Component
 export struct Settings {
@@ -26,7 +34,9 @@ export struct Settings {
       Column({space: 5}){
         Column({space: 5}){
           Text(`本地缓存清理`)
+            .fontWeight(FontWeight.Lighter)
             .titleTextStyle()
+          Divider()
           Column({space: 5}){
             Button(`清理学生信息缓存`)
               .onClick(async ()=>{
@@ -37,6 +47,7 @@ export struct Settings {
                   this.promptAction.showToast({message: '学生信息清理失败'})
                 }
               })
+              .buttonCardStyle()
               .width('90%')
             Button(`清理学期信息缓存`)
               .onClick(async ()=>{
@@ -47,6 +58,7 @@ export struct Settings {
                   this.promptAction.showToast({message: '学期信息清理失败'})
                 }
               })
+              .buttonCardStyle()
               .width('90%')
             Button(`清理课程表缓存`)
               .onClick(async ()=>{
@@ -58,13 +70,19 @@ export struct Settings {
                 }
               })
               .width('90%')
+              .buttonCardStyle()
           }
             .width('90%')
         }
           .cardStyle('#20000080')
       }
         .width('90%').height('100%')
+        .padding(24)
+        .backgroundColor($r('sys.color.ohos_id_color_background'))
+        .borderRadius(16)
+        .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
     }
       .title(`设置`)
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }

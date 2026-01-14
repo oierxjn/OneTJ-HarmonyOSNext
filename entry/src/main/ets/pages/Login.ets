@@ -1,7 +1,7 @@
 import { asyncSleep, fetchNewWallpaper, wallpaperPixelMap } from '../components/Funcs';
 import { initKVManager } from '../DisplayUtils/DataUtils';
 import { tongjiApi } from '../models/TongjiApi';
-import { OAuthCode, TokenData } from '../models/UserModel';
+import { OAuthCode, TokenData, UserPreference } from '../models/UserModel';
 import { DetailMsg } from './DetailMsg';
 import { Home } from './Home';
 import { LoginOAuthWebView } from './LoginOAuthWebView';
@@ -17,6 +17,8 @@ import { Settings } from './Settings';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { font } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { JSON } from '@kit.ArkTS';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -43,55 +45,30 @@ export let bundleInfo: undefined | bundleManager.BundleInfo
 const REFRESH_TOKEN: boolean = true
 const AUTO_LOGIN_DELAY: number = 0
 
-class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
-  backgroundOpacity: number = 0
-  colorTheme: Array<Array<[string, number]>> = [
-    [['#FF000000', 0.0], ['#FF000000', 1]],
-    [['#ff32d043', 0.0], ['#ffff4136', 1]]
-  ]
-
-  applyNormalAttribute(instance: TextAttribute): void {
-    if(deviceInfo.sdkApiVersion >= 20){
-      instance.shaderStyle({
-        direction: GradientDirection.Right,
-        colors: this.colorTheme[this.backgroundOpacity]
-      })
-    }
-  }
-  constructor(backgroundOpacity: number, colorTheme: Array<Array<[string, number]>>) {
-    this.backgroundOpacity = backgroundOpacity
-    this.colorTheme = colorTheme
-  }
-}
-
-
+AppStorage.setOrCreate('agreePolicy', false)
+AppStorage.setOrCreate('allowLogin', false)
+AppStorage.setOrCreate('loginButtonText', $r('app.string.Uni_login'))
 
 @Entry
 @Component
 struct Login {
   @State appTitle: Resource | string = $r('app.string.EntryAbility_label');
 
-  @State loginButtonText: Resource | string = $r('app.string.Uni_login');
-  @State allowLogin: boolean = false;
+  @StorageLink('loginButtonText') loginButtonText: Resource | string = $r('app.string.Uni_login');
+  @StorageLink('allowLogin') allowLogin: boolean = false;
+  @StorageLink('agreePolicy') agreePolicy: boolean = false;
   @State wallpaper: string | image.PixelMap = '#40942610'
-  @State @Watch('onBackgroundOpacityChanged')backgroundOpacity: number = 0;
+  @State backgroundOpacity: number = 0;
 
-  @State @Watch('onColorThemeChanged')colorTheme: Array<Array<[string, number]>> = [
-    [['#FF000000', 0.0], ['#FF000000', 1]],
+  @State colorTheme: Array<Array<[ResourceStr, number]>> = [
+    [[$r('sys.color.ohos_id_color_text_primary'), 0.0], [$r('sys.color.ohos_id_color_text_primary'), 1]],
     [['#ff32d043', 0.0], ['#ffff4136', 1]]
   ]
 
-  shaderStyleModifier = new ShaderStyleModifier(this.backgroundOpacity, this.colorTheme)
-
-  onBackgroundOpacityChanged(){
-    this.shaderStyleModifier.backgroundOpacity = this.backgroundOpacity
-  }
-  onColorThemeChanged(){
-    this.shaderStyleModifier.colorTheme = this.colorTheme
-  }
-
   uiContext = this.getUIContext()
   promptAction = this.uiContext.getPromptAction()
+
+  titleTextFamily:string = 'HarmonyOS Sans SC'
 
 
   @Provide('navPathStack') navPathStack: NavPathStack = new NavPathStack()
@@ -130,6 +107,7 @@ struct Login {
       familyName: 'SanJiPoMoTi',
       familySrc: $rawfile('font/SanJiPoMoTi-2-slim.ttf')
     })
+    this.titleTextFamily = 'SanJiPoMoTi'
 
     this.loginButtonText = '自动登录中'
     this.allowLogin = false
@@ -140,15 +118,25 @@ struct Login {
       console.error('KVManager初始化失败')
       return
     }
-
+    await this.loadUserPreference()
     let result = await Promise.all([this.autoLogin(), asyncSleep(AUTO_LOGIN_DELAY)])
     if(result[0]){
-      this.navPathStack.pushPath({name: PageName.HomePage})
+      setTimeout(()=>{
+        this.navPathStack.pushPath({name: PageName.HomePage})
+      })
     }else{
       this.loginButtonText = $r('app.string.Uni_login')
       this.allowLogin = true
     }
     Promise.all([wallpaperTask, bundleInfoTask])
+  }
+
+  async loadUserPreference(){
+    await UserPreference.initKV()
+    await UserPreference.loadFromKV()
+    if(UserPreference.isFetched){
+      this.agreePolicy = UserPreference.agreePolicy
+    }
   }
 
   async getBundleInfo(){
@@ -194,18 +182,27 @@ struct Login {
         .width('100%').height('100%')
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       Navigation(this.navPathStack){
-        Column({space : '20%'}) {
-          Text(this.backgroundOpacity ? this.appTitle : this.appTitle)
-            .id('title_text')
-            .fontSize($r('app.float.page_text_font_size')).fontWeight(FontWeight.Bold)
-            .onClick(() => {
-              this.appTitle = 'Welcome';
+        Column({space : 20}) {
+          Row(){
+            Text(this.backgroundOpacity ? this.appTitle : this.appTitle)
+              .id('title_text')
+              .fontSize($r('app.float.page_text_font_size')).fontFamily(this.titleTextFamily)
+              .onClick(() => {
+                this.titleTextFamily = 'HarmonyOS Sans SC'
+                this.appTitle = '欢迎来到同济';
+              })
+              .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
+          }
+            .linearGradient({
+              direction: GradientDirection.Right,
+              colors: this.colorTheme[this.backgroundOpacity]
             })
-            .attributeModifier(this.shaderStyleModifier)
+            .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
+
 
           Column(){
             Button(this.loginButtonText)
-              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('sys.color.ohos_id_color_text_primary'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),
@@ -213,16 +210,28 @@ struct Login {
               })
               .backgroundColor($r('app.color.start_window_button_background'))
               .margin({bottom: "5%",top: "10%"})
-              .onClick(async () => {
-                if(!this.allowLogin)return;
-                if(TokenData.isFetched){
-                  this.navPathStack.pushPath({name: PageName.HomePage})
-                }else{
-                  this.navPathStack.pushPath({name: PageName.LoginOAuthWebView})
-                }
+              .onClick(()=>{
+                setTimeout(async () => {
+                  if (!this.allowLogin) return;
+                  if (!this.agreePolicy){
+                    try {
+                      this.promptAction.showToast({message: `请先阅读并同意隐私政策`})
+                    } catch (e){
+                      console.error(JSON.stringify(e))
+                    }
+                    return
+                  }
+                  UserPreference.storeUserPreference(this.agreePolicy)
+                  if (TokenData.isFetched) {
+                    this.navPathStack.pushPath({ name: PageName.HomePage })
+                  } else {
+                    this.navPathStack.pushPath({ name: PageName.LoginOAuthWebView })
+                  }
+                  await UserPreference.storeIntoKV()
+                })
               })
             Button($r('app.string.Join_in_group'))
-              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('app.color.black'))
+              .fontSize($r('app.float.page_text_normal_size')).fontColor($r('sys.color.ohos_id_color_text_primary'))
               .width("80%")
               .padding({
                 top:$r('app.float.text_vertical_padding'),
@@ -233,14 +242,20 @@ struct Login {
               .onClick(()=>{
                 this.navPathStack.pushPath({name: PageName.JoinGroupPage})
               })
-            Text(`登录本应用则视为已同意`)
-              .textAlign(TextAlign.Center)
-            Text(`『一统同济用户隐私政策』`)
-              .fontColor(Color.Blue)
-              .onClick(()=>{
-                this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
-              })
-              .textAlign(TextAlign.Center)
+            Row(){
+              Checkbox()
+                .select($$this.agreePolicy)
+              Column(){
+                Text(`已阅读并同意`)
+                  .textAlign(TextAlign.Center)
+                Text(`『一统同济用户隐私政策』`)
+                  .fontColor($r('sys.color.ohos_id_color_emphasize'))
+                  .onClick(()=>{
+                    this.navPathStack.pushPath({name: PageName.PrivacyPolicyPage})
+                  })
+                  .textAlign(TextAlign.Center)
+              }
+            }
           }
           .borderRadius('10%')
           .backgroundBlurStyle(BlurStyle.Thin)

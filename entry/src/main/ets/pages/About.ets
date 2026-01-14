@@ -19,28 +19,10 @@ function cardStyle(backgroundColor: ResourceColor){
   .backgroundColor(backgroundColor)
 }
 
-class ShaderStyleModifier implements AttributeModifier<TextAttribute>{
-  colorTheme: Array<[string, number]> = [['#ff32d043', 0.0], ['#ffff4136', 1]]
-
-  applyNormalAttribute(instance: TextAttribute): void {
-    if(deviceInfo.sdkApiVersion >= 20){
-      instance.shaderStyle({
-        direction: GradientDirection.Right,
-        colors: this.colorTheme
-      })
-    }
-  }
-  constructor(colorTheme: Array<[string, number]>) {
-    this.colorTheme[0] = colorTheme[0]
-    this.colorTheme[1] = colorTheme[1]
-  }
-}
 
 @Component
 export struct About{
-  @State colorTheme: Array<[string, number]> =[['#ff32d043', 0.0], ['#ffff4136', 1]]
-
-  shaderStyleModifier = new ShaderStyleModifier(this.colorTheme)
+  @State colorTheme: Array<[string, number]> =[['#ff0631f5', 0.0], ['#ff922626', 1]]
 
   @Consume('navPathStack')navPathStack: NavPathStack
   build() {
@@ -49,18 +31,29 @@ export struct About{
         Image($r('app.media.logo'))
           .width('40%')
           .borderRadius('20%')
-        Text($r('app.string.EntryAbility_label'))
-          .fontSize(40)
-          .fontFamily('')
-          .textAlign(TextAlign.Center)
-          .attributeModifier(this.shaderStyleModifier)
+        Row(){
+          Text($r('app.string.EntryAbility_label'))
+            .fontSize(40).fontFamily('SanJiPoMoTi')
+            .textAlign(TextAlign.Center)
+            .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN)
+        }
+          .linearGradient({
+            direction: GradientDirection.Right,
+            colors: this.colorTheme
+          })
+          .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
         Text($r('app.string.Version_name'))
           .fontSize(25)
           .textAlign(TextAlign.Center)
         Text($r('app.string.Build_time'))
           .fontSize(25)
           .textAlign(TextAlign.Center)
-        // Text(`在信息化办公室指导下研发完成`)
+        Row(){
+          Image($rawfile('icon/TJ.png'))
+            .width('30%')
+        }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceAround)
         Blank()
         Column(){
           Text(`查看隐私政策`)
@@ -100,12 +93,12 @@ export struct About{
         }
           .width('100%').height('100%')
           .padding(24)
-          .backgroundColor(Color.White)
+          .backgroundColor($r('sys.color.ohos_id_color_background'))
           .borderRadius(16)
           .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
     }
     .padding(16)
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     .title(`关于本app`)
   }
 }

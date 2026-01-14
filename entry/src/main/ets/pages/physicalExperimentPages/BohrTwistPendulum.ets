@@ -24,7 +24,7 @@ function normalTextStyle(){
 
 @Extend(Column)
 function cardStyle(){
-  .backgroundColor(Color.White)
+  .backgroundColor($r('sys.color.ohos_id_color_background'))
   .borderRadius(16)
   .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
   .padding(16)
@@ -129,7 +129,7 @@ export struct BohrTwistPendulum{
       .width('100%').height('100%')
       .align(Alignment.Top)
     }
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     .title('波尔扭摆实验')
     .menus([
       {

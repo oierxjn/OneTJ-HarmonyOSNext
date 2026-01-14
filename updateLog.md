@@ -7,6 +7,10 @@ Build Time: 2025.12.28-21:05
 * 优化UI设计
 * 大规模重构兼容
 
+### Contributors:
+[oierxjn](https://github.com/oierxjn)  
+[streetartist](https://github.com/streetartist)
+
 1.0.0 (2)
 ---
 Version: 1.0.0  
