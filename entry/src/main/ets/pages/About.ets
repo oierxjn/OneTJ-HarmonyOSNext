@@ -48,7 +48,12 @@ export struct About{
         Text($r('app.string.Build_time'))
           .fontSize(25)
           .textAlign(TextAlign.Center)
-        // Text(`在信息化办公室指导下研发完成`)
+        Row(){
+          Image($rawfile('icon/TJ.png'))
+            .width('30%')
+        }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceAround)
         Blank()
         Column(){
           Text(`查看隐私政策`)
