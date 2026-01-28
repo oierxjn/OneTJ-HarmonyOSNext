@@ -1,3 +1,15 @@
+1.1.0 (4)
+---
+Version: 1.1.0
+Build Time: 2026.01.28-13:05
+
+### Update Log:
++ 新增绩点查询功能
+- 删除通知详情中的其他应用打开按钮
+
+### Contributors:
+[oierxjn](https://github.com/oierxjn)
+
 1.0.1 (3)
 ---
 Version: 1.0.1
