@@ -523,15 +523,17 @@ export class CreditInfo{
   courseName: string;
   gradePoint: number;
   publicCoursesName: string;
-  constructor(courseName: string, gradePoint: number, publicCoursesName: string) {
+  updateTime: string;
+  constructor(courseName: string, gradePoint: number, publicCoursesName: string, updateTime: string) {
     this.courseName = courseName;
     this.gradePoint = gradePoint;
     this.publicCoursesName = publicCoursesName;
+    this.updateTime = updateTime;
   }
 
   static fromJson(json: Object): CreditInfo {
     let data = json as object;
-    return new CreditInfo(data['courseName'], data['gradePoint'], data['publicCoursesName']);
+    return new CreditInfo(data['courseName'], data['gradePoint'], data['publicCoursesName'], data['updateTime']);
   }
   static buildList(jsonArray: Array<Object>): CreditInfo[]{
     return jsonArray.map(CreditInfo.fromJson);
@@ -560,7 +562,7 @@ export class CourseScore{
   actualCredit: number;
   failingCredits: number;
   failingCourseCount: number;
-  TermScoreList: TermScore[];
+  termScoreList: TermScore[];
 
   constructor(totalGradePoint: string, actualCredit: string, failingCredits: string, failingCourseCount: string , TermScoreList: Array<Object>) {
     this.totalGradePoint = parseFloat(totalGradePoint);
@@ -568,7 +570,7 @@ export class CourseScore{
     this.failingCredits = parseFloat(failingCredits);
     this.failingCourseCount = parseInt(failingCourseCount);
 
-    this.TermScoreList = TermScore.buildList(TermScoreList);
+    this.termScoreList = TermScore.buildList(TermScoreList);
   }
 
   static fromJson(json: Object): CourseScore {

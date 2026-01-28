@@ -31,7 +31,7 @@ export class TongjiApiUrlConstants {
   public static readonly GET_MSG_DETAIL_URL = `${this.BASE_URL}/v1/rt/onetongji/msg_detail`
   public static readonly GET_STUDENT_TIMETABLE_URL = `${this.BASE_URL}/v1/rt/onetongji/student_timetable`
   public static readonly GET_STUDENT_SUMMARIZE_SCORES_URL = `${this.BASE_URL}/v2/rt/teaching_info/undergraduate_summarized_grades`
-  public static readonly GET_STUDENT_UNDERGRADUATE_SCORES_URL = `${this.BASE_URL}/v1/rt/onetongji/undergraduate_score`
+  public static readonly GET_STUDENT_UNDERGRADUATE_SCORES_URL = `${this.BASE_URL}/v1/rt/onetongji/undergraduate_score?calendarId=-1`
 }
 
 export class XJNUrlConstants{
