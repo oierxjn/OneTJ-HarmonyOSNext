@@ -1,11 +1,14 @@
 import { TongjiApiUrlConstants } from "../constants/WebUrlConstants";
 import { http } from "@kit.NetworkKit";
-import { CourseInfo, CourseInfoList, MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
+import { CourseInfo, CourseInfoList,
+  CourseScore,
+  MsgList, SchoolCalendarInfo, StudentInfo, TokenData } from "./UserModel";
 import { preferences } from "@kit.ArkData";
 import { distributedKVStore } from '@kit.ArkData'
 import { ErrorCode } from "@kit.AbilityKit";
 import { CommonMsgData } from "../DisplayUtils/DataUtils";
 import { BusinessError } from "@kit.BasicServicesKit";
+import { Global } from "./Global";
 
 class TongjiApi {
 
@@ -28,6 +31,20 @@ class TongjiApi {
     } finally {
       TokenData.isFetched = false
       StudentInfo.isFetched = false
+    }
+  }
+
+  async getCourseScore(): Promise<void>{
+    let baseUrl = TongjiApiUrlConstants.GET_STUDENT_UNDERGRADUATE_SCORES_URL
+    let httpRequest = http.createHttp()
+    let response : http.HttpResponse
+    try {
+      response = await httpRequest.request(baseUrl, TongjiApi.requestOptions)
+      let responseData = this.responseToData(response.result as string)
+      Global.courseScore = CourseScore.fromJson(responseData)
+    } catch (e){
+      console.error(`请求课程成绩时发生错误：${(e as BusinessError).message}`)
+      throw new Error(`请求课程成绩时发生错误：${(e as BusinessError).message}`)
     }
   }
 

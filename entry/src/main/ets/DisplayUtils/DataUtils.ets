@@ -173,7 +173,8 @@ export enum HomeFunctions {
   GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY = 'graduate_student_time_table_single_day',
   LOGOUT = 'logout',
   JOIN_QQ_GROUP = 'join_qq_group',
-  EXP_CALC = 'experimental_calculation'
+  EXP_CALC = 'experimental_calculation',
+  COURSE_SCORES = 'course_scores',
 }
 
 export class HomeFunctionItem {
