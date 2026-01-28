@@ -19,6 +19,8 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { font } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { JSON } from '@kit.ArkTS';
+import { CourseInfoCard } from '../components/InfoCard';
+import { Scores } from './Scores';
 
 export enum PageName{
   HomePage = 'Page_Home',
@@ -30,6 +32,7 @@ export enum PageName{
   JoinGroupPage = 'Page_Join_Group',
   SettingsPage = 'Page_Settings',
   PrivacyPolicyPage = 'Page_Privacy_Policy',
+  CourseScorePage = 'Page_Course_Score',
 }
 
 export enum PhysicalExperimentSub{
@@ -92,11 +95,13 @@ struct Login {
       JoinGroup()
     }else if(name == PageName.AboutPage){
       About()
+    }else if(name == PageName.CourseScorePage){
+      Scores()
     }else if(name == PageName.SettingsPage){
       Settings()
     }else if(name == PhysicalExperimentSub.BohrTwistPendulumPage){
       BohrTwistPendulum()
-    }else if(name == HelpSub.ExperimentHelpPage){
+    }else if(name == HelpSub.ExperimentHelpPage) {
       ExperimentHelp()
     }
   }

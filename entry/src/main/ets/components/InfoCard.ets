@@ -1,4 +1,4 @@
-import { CourseInfo } from "../models/UserModel"
+import { CourseInfo, CreditInfo } from "../models/UserModel"
 import { PageName } from "../pages/Login"
 import { LengthMetrics } from "@kit.ArkUI"
 
@@ -68,6 +68,43 @@ export struct CourseInfoCard {
           .textOverflow({overflow: TextOverflow.Ellipsis})
           
         Text(`教师：${this.course.teacher}`)
+          .fontSize(14)
+          .fontColor(Color.Gray)
+          .margin({ top: 4 })
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+    }
+    .width('100%')
+    .padding(16)
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
+    .borderRadius(16)
+    .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
+  }
+}
+@Component
+export struct CourseScoreCard{
+  @Require creditInfo: CreditInfo
+
+  build() {
+    Row() {
+      Column() {
+        Text(this.creditInfo.courseName)
+          .fontSize(18)
+          .fontWeight(FontWeight.Bold)
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+
+        Text(`绩点：${this.creditInfo.gradePoint}`)
+          .fontSize(14)
+          .fontColor(Color.Gray)
+          .margin({ top: 4 })
+          .maxLines(1)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+
+        Text(`更新时间：${this.creditInfo.updateTime}`)
           .fontSize(14)
           .fontColor(Color.Gray)
           .margin({ top: 4 })

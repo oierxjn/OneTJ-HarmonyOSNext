@@ -518,3 +518,63 @@ export class UserPreference{
     }
   }
 }
+
+export class CreditInfo{
+  courseName: string;
+  gradePoint: number;
+  publicCoursesName: string;
+  updateTime: string;
+  constructor(courseName: string, gradePoint: number, publicCoursesName: string, updateTime: string) {
+    this.courseName = courseName;
+    this.gradePoint = gradePoint;
+    this.publicCoursesName = publicCoursesName;
+    this.updateTime = updateTime;
+  }
+
+  static fromJson(json: Object): CreditInfo {
+    let data = json as object;
+    return new CreditInfo(data['courseName'], data['gradePoint'], data['publicCoursesName'], data['updateTime']);
+  }
+  static buildList(jsonArray: Array<Object>): CreditInfo[]{
+    return jsonArray.map(CreditInfo.fromJson);
+  }
+}
+export class TermScore{
+  termName: string;
+  averagePoint: number;
+  creditInfoList: CreditInfo[];
+  constructor(termName: string, averagePoint: string, creditInfoList: Array<Object>) {
+    this.termName = termName;
+    this.averagePoint = parseFloat(averagePoint);
+    this.creditInfoList = CreditInfo.buildList(creditInfoList);
+  }
+
+  static fromJson(json: Object): TermScore {
+    let data = json as object;
+    return new TermScore(data['termName'], data['averagePoint'], data['creditInfo']);
+  }
+  static buildList(jsonArray: Array<Object>): TermScore[]{
+    return jsonArray.map(TermScore.fromJson);
+  }
+}
+export class CourseScore{
+  totalGradePoint: number;
+  actualCredit: number;
+  failingCredits: number;
+  failingCourseCount: number;
+  termScoreList: TermScore[];
+
+  constructor(totalGradePoint: string, actualCredit: string, failingCredits: string, failingCourseCount: string , TermScoreList: Array<Object>) {
+    this.totalGradePoint = parseFloat(totalGradePoint);
+    this.actualCredit = parseFloat(actualCredit);
+    this.failingCredits = parseFloat(failingCredits);
+    this.failingCourseCount = parseInt(failingCourseCount);
+
+    this.termScoreList = TermScore.buildList(TermScoreList);
+  }
+
+  static fromJson(json: Object): CourseScore {
+    let data = json as object;
+    return new CourseScore(data['totalGradePoint'], data['actualCredit'], data['failingCredits'], data['failingCourseCount'], data['term']);
+  }
+}

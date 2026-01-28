@@ -44,6 +44,9 @@ let HomeFunctionMap: Record<HomeFunctions, (navPathStack: NavPathStack, context?
   },
   [HomeFunctions.EXP_CALC]: (navPathStack: NavPathStack): void => {
     navPathStack.pushPath({name: PageName.PhysicalExperimentPage})
+  },
+  [HomeFunctions.COURSE_SCORES]: (navPathStack: NavPathStack): void => {
+    navPathStack.pushPath({name: PageName.CourseScorePage})
   }
 }
 
@@ -56,6 +59,7 @@ export struct DashBoard {
   HomeFuncList: HomeFunctionItem[] = new Array<HomeFunctionItem>()
   async aboutToAppear() {
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.GRADUATE_STUDENT_TIME_TABLE_SINGLE_DAY, '单日课程', $rawfile('fluentemoji-png/alarm_clock_3d.png')))
+    this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.COURSE_SCORES, '课程成绩', $rawfile('fluentemoji-png/shushing_face_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.EXP_CALC, '实验计算', $rawfile('fluentemoji-png/microscope_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.LOGOUT, '退出登录', $rawfile('fluentemoji-png/wilted_flower_3d.png')))
     this.HomeFuncList.push(new HomeFunctionItem(HomeFunctions.JOIN_QQ_GROUP, '加讨论群', $rawfile('fluentemoji-png/zany_face_3d.png')))
@@ -88,7 +92,7 @@ export struct DashBoard {
         .clickEffect({ level: ClickEffectLevel.LIGHT })
       })
     }
-    .columnsTemplate('1fr 1fr 1fr')
+    .columnsTemplate('1fr 1fr 1fr 1fr')
     .rowsTemplate('1fr 1fr')
     .rowsGap(12)
     .columnsGap(12)

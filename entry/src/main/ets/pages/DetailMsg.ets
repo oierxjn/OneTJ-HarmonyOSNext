@@ -141,16 +141,6 @@ export struct DetailMsg {
               .backgroundColor($r('sys.color.ohos_id_color_background'))
               .borderRadius(20)
               .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
-            Button(`用其他应用打开`)
-              .onClick(async () => {
-                openBrowserLink(this.getUIContext())
-              })
-              .height(40)
-              .layoutWeight(1)
-              .fontColor('#007DFF')
-              .backgroundColor($r('sys.color.ohos_id_color_background'))
-              .borderRadius(20)
-              .shadow({ radius: 5, color: 'rgba(0,0,0,0.05)', offsetX: 0, offsetY: 2 })
           }
           .width('100%')
           .padding({ left: 16, right: 16, top: 12, bottom: 12 })
